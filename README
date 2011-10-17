@@ -1,0 +1,5 @@
+A fork of the Finite State Machine that is a part of the tungsten replicator. The original project can be found here: http://sourceforge.net/projects/tungsten-fsm/
+
+Why fork?
+* Migrate the code to use SLF4J instead of log4j
+* Use maven to manage the build

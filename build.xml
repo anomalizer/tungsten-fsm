@@ -1,0 +1,266 @@
+<!--
+    Tungsten Scale-Out Stack
+    Copyright (C) 2007-2009 Continuent Inc.
+    Contact: tungsten@continuent.org
+   
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of version 2 of the GNU General Public License as
+    published by the Free Software Foundation.
+   
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+   
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+       
+    Initial developer(s): Marc Herbert, Jeff Mesnil
+    Contributor(s): Csaba Simon, Robert Hodges
+-->
+
+<project name="tungsten-fsm" default="all">
+    <description>
+        Tungsten Scale-Out Stack
+        Finite State Machine Library 
+        http://community.continuent.com
+    </description>
+
+    <property file="version.properties"/>
+    <property file="build.properties"/>
+    <property file="local.build.properties"/>
+
+    <property name="top" value="."/>
+    <property name="build.dir" value="build"/>
+    <property name="conf.dir" value="conf"/>
+    <property name="java.src.dir" value="src/java"/>
+    <property name="test.src.dir" value="test/java"/>
+    <property name="classes.dir" value="${build.dir}/java/classes"/>
+    <property name="test.classes.dir" value="${build.dir}/test/classes"/>
+    <property name="test.reports" value="${build.dir}/reports"/>
+    <property name="test.work" value="${build.dir}/work"/>
+    <property name="jars.dir" value="${build.dir}/jars"/>
+    <property name="dist.dir" value="${build.dir}/tungsten-fsm"/>
+    <property name="dist.src.dir" value="${build.dir}/tungsten-fsm-src"/>
+    <property name="tungsten.prefix" value="tungsten-fsm-${version}" />
+    <property name="tungsten-fsm.jar" value="${jars.dir}/${tungsten.prefix}.jar"/>
+    <property name="tungsten-fsm-src.jar" value="${jars.dir}/${tungsten.prefix}-src.jar"/>
+    
+    <path id="compile.classpath">
+        <fileset dir="lib/">
+            <include name="*.jar" unless="library.compile.files"/>
+            <include name="${library.compile.files}" if="library.compile.files"/>
+        </fileset>   
+    </path>
+
+    <path id="test.classpath">
+        <path refid="compile.classpath"/>
+        <path location="${classes.dir}"/>
+    </path>
+
+    <target name="all" depends="clean,test, releases" 
+            description="--> test code and create releases"/>
+    
+    <target name="allExceptJunit" depends="clean,compile, releases" 
+            description="Builds the project without running unit tests. "/>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+    
+    <target name="zipdoc">
+        <zip destfile="${build.dir}/tungsten-fsm_javadoc.zip">
+            <fileset dir="${dist.dir}/docs/javadoc"/>
+        </zip>
+        <tar compression="gzip" destfile="${build.dir}/tungsten-fsm_javadoc.tar.gz">
+            <fileset dir="${dist.dir}/docs/javadoc"/>
+        </tar>
+    </target>
+    
+    <target name="compile">
+        <mkdir dir="${classes.dir}"/>
+        <javac srcdir="${java.src.dir}"
+               destdir="${classes.dir}"
+               classpathref="compile.classpath"
+               source="${javac.source}"
+               target="${javac.target}"
+               encoding="${javac.encoding}"
+               debug="${javac.debug}"
+               deprecation="${javac.deprecation}"/>
+    </target>
+
+    <target name="compile-test" depends="compile">
+        <mkdir dir="${test.classes.dir}"/>
+        <javac srcdir="${test.src.dir}" destdir="${test.classes.dir}" classpathref="test.classpath"/>
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="${jars.dir}"/>
+        <jar destfile="${tungsten-fsm.jar}">
+            <manifest>
+                <attribute name="Specification-Title"
+                           value="${specification.title}"/>
+                <attribute name="Specification-Vendor"
+                           value="${specification.vendor}"/>
+                <attribute name="Specification-Version"
+                           value="${version}"/>
+                <attribute name="Implementation-Title"
+                           value="${specification.title}"/>
+                <attribute name="Implementation-Vendor"
+                           value="${specification.vendor}"/>
+                <attribute name="Implementation-Version"
+                           value="${version}"/>
+                <attribute name="Class-path"
+                           value="log4j-1.2.14.jar"/>
+            </manifest>
+            <fileset dir="${classes.dir}">
+                <include name="**/*.class"/>
+            </fileset>
+        </jar>
+        <jar destfile="${tungsten-fsm-src.jar}">
+            <manifest>
+                <attribute name="Specification-Title"
+                           value="${specification.title}"/>
+                <attribute name="Specification-Vendor"
+                           value="${specification.vendor}"/>
+                <attribute name="Specification-Version"
+                           value="${version}"/>
+                <attribute name="Implementation-Title"
+                           value="${specification.title}"/>
+                <attribute name="Implementation-Vendor"
+                           value="${specification.vendor}"/>
+                <attribute name="Implementation-Version"
+                           value="${version}"/>
+            </manifest>
+            <fileset dir="${java.src.dir}">
+                <include name="**/*.java"/>
+            </fileset>
+        </jar>
+    </target>
+
+    <target name="test" depends="compile-test" description="--> run unit tests">
+        <delete dir="${test.reports}"/>
+        <mkdir dir="${test.reports}"/>
+        <delete dir="${test.work}"/>
+        <mkdir dir="${test.work}"/>
+        <junit printsummary="yes" haltonfailure="no" fork="yes" 
+            dir="${test.work}" failureproperty="tests.failed">
+            <classpath>
+                <pathelement location="${classes.dir}"/>
+                <pathelement location="${test.classes.dir}"/>
+                <pathelement location="${conf.dir}"/>
+                <path refid="compile.classpath"/>
+                <path refid="test.classpath"/>
+            </classpath>
+            <formatter type="xml"/>
+            <batchtest fork="yes" todir="${test.reports}">
+                <fileset dir="${test.src.dir}">
+                    <include name="**/*Test*.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+        <junitreport tofile="${test.reports}/TESTS-TestSuites.xml">
+            <fileset dir="${test.reports}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="${test.reports}/html"/>
+        </junitreport>
+        <fail if="tests.failed" message="Not all unit tests were completed. Process aborted!"/>
+    </target>
+
+    <target name="dist" depends="dist-bin, dist-src" 
+            description="--> build distribution"/>
+
+    <target name="dist-bin" depends="jar" 
+            description="--> build binary distribution">
+        <mkdir dir="${dist.dir}"/>
+        <copy file="LICENSE" tofile="${dist.dir}/LICENSE" />
+        <copy todir="${dist.dir}/lib">
+            <fileset dir="${jars.dir}"/>
+        </copy>
+        <available property="has.conf" file="conf" type="dir"/>
+        <copy filtering="true" todir="${dist.dir}/conf" failonerror="has.conf">
+            <fileset dir="conf"/>
+            <filterset>
+                <filter token="VERSION" value="${version}"/>
+            </filterset>
+        </copy>
+        <copy todir="${dist.dir}/lib">
+            <fileset dir="lib/">
+                <include name="*.jar" unless="library.compile.files"/>
+                <include name="${library.compile.files}" if="library.compile.files"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="dist-src" depends="jar" 
+            description="--> build source distribution">
+        <mkdir dir="${dist.src.dir}"/>
+        <!-- No scripts at bin directory at the moment -->
+        <mkdir dir="${dist.src.dir}/bin"/> 
+
+        <copy todir="${dist.src.dir}">
+            <fileset file="LICENSE"/>
+            <fileset file="README"/>
+            <fileset file="build.properties"/>
+            <fileset file="build.xml"/>
+            <fileset file="version.properties"/>
+        </copy>
+
+        <copy todir="${dist.src.dir}/conf">
+            <fileset dir="conf"/>
+        </copy>
+        <copy todir="${dist.src.dir}/doc">
+            <fileset dir="doc"/>
+        </copy>
+        <copy todir="${dist.src.dir}/lib">
+            <fileset dir="lib"/>
+        </copy>
+        <copy todir="${dist.src.dir}/src">
+            <fileset dir="src"/>
+        </copy>
+        <copy todir="${dist.src.dir}/test">
+            <fileset dir="test"/>
+        </copy>
+    </target>
+
+    <target name="docs">
+        <javadoc packagenames="com.continuent.*"
+            sourcepath="${java.src.dir}"
+            classpathref="compile.classpath"
+            defaultexcludes="yes"
+            destdir="${dist.dir}/docs/javadoc"
+            author="true"
+            version="true"
+            use="true"
+            windowtitle="Tungsten API">
+        </javadoc>
+    </target>
+
+    <target name="releases" depends="dist, docs" 
+        description="--> create distributable software (.zip &amp; .tgz files)">
+        <tar destfile="${dist.dir}-${version}.tgz" compression="gzip" basedir="${dist.dir}" includes="none" longfile="gnu">
+            <tarfileset dir="${dist.dir}" prefix="tungsten-fsm-${version}">
+                <include name="*/**"/>
+            </tarfileset>
+        </tar>
+        <tar destfile="${dist.dir}-src-${version}.tgz" compression="gzip" basedir="${dist.src.dir}" includes="none" longfile="gnu">
+            <tarfileset dir="${dist.src.dir}" prefix="tungsten-fsm-src-${version}">
+                <include name="*/**"/>
+            </tarfileset>
+        </tar>
+
+        <zip destfile="${dist.dir}-${version}.zip" basedir="${dist.dir}" includes="none">
+            <zipfileset dir="${dist.dir}" prefix="tungsten-fsm-${version}">
+                <include name="*/**"/>
+            </zipfileset>
+        </zip>
+        <zip destfile="${dist.dir}-src-${version}.zip" basedir="${dist.src.dir}" includes="none">
+            <zipfileset dir="${dist.src.dir}" prefix="tungsten-fsm-src-${version}">
+                <include name="*/**"/>
+            </zipfileset>
+        </zip>
+        <antcall target="zipdoc"/>
+    </target>
+</project>
