@@ -112,7 +112,7 @@
                 <attribute name="Implementation-Version"
                            value="${version}"/>
                 <attribute name="Class-path"
-                           value="log4j-1.2.14.jar"/>
+                           value="slf4j-api-1.6.2.jar"/>
             </manifest>
             <fileset dir="${classes.dir}">
                 <include name="**/*.class"/>
