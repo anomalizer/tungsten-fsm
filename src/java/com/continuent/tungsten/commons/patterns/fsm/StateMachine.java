@@ -165,9 +165,8 @@ public class StateMachine
         State nextState = transition.getOutput();
         if (logger.isDebugEnabled())
         {
-            logger.debug("Executing state transition: input state="
-                    + state.getName() + " transition=" + transition.getName()
-                    + " output state=" + nextState.getName());
+            logger.debug("Executing state transition: input state={} transition={} output state={}",
+                    new Object[] {state.getName(), transition.getName(), nextState.getName()});
         }
 
         int actionType = -1;
@@ -187,8 +186,8 @@ public class StateMachine
                 State exitState = state;
                 if (logger.isDebugEnabled())
                     logger
-                            .debug("Searching for exit actions for current state: "
-                                    + state.getName());
+                            .debug("Searching for exit actions for current state: {}",
+                                    state.getName());
 
                 while (exitState != null && exitState != leastCommonParent)
                 {
@@ -197,8 +196,8 @@ public class StateMachine
                         Action exitAction = exitState.getExitAction();
                         actionType = Action.EXIT_ACTION;
                         if (logger.isDebugEnabled())
-                            logger.debug("Executing exit action for state: "
-                                    + exitState.getName());
+                            logger.debug("Executing exit action for state: {}",
+                                    exitState.getName());
                         exitAction.doAction(event, entity, transition,
                                 actionType);
                     }
@@ -213,8 +212,8 @@ public class StateMachine
                 Action transitionAction = transition.getAction();
                 actionType = Action.TRANSITION_ACTION;
                 if (logger.isDebugEnabled())
-                    logger.debug("Executing action for transition: "
-                            + transition.getName());
+                    logger.debug("Executing action for transition: {}",
+                            transition.getName());
                 transitionAction
                         .doAction(event, entity, transition, actionType);
             }
@@ -223,8 +222,8 @@ public class StateMachine
             if (state != nextState)
             {
                 if (logger.isDebugEnabled())
-                    logger.debug("Searching for entry actions for next state: "
-                            + nextState.getName());
+                    logger.debug("Searching for entry actions for next state: {}",
+                            nextState.getName());
 
                 // Fire entry actions from the state below the least common
                 // parent (if there is one) to the next state itself.
@@ -252,8 +251,8 @@ public class StateMachine
                         Action entryAction = entryState.getEntryAction();
                         actionType = Action.ENTER_ACTION;
                         if (logger.isDebugEnabled())
-                            logger.debug("Executing entry action for state: "
-                                    + entryState.getName());
+                            logger.debug("Executing entry action for state: {}",
+                                    entryState.getName());
                         entryAction.doAction(event, entity, transition,
                                 actionType);
                     }
@@ -264,18 +263,16 @@ public class StateMachine
         {
             // Log and rethrow a rollback exception.
             if (logger.isDebugEnabled())
-                logger.debug("Transition rolled back: state=" + state.getName()
-                        + " transition=" + transition.getName()
-                        + " actionType=" + actionType);
+                logger.debug("Transition rolled back: state={} transition={} actionType={}",
+                    new Object[] {state.getName(), transition.getName(), actionType});
             throw e;
         }
         catch (TransitionFailureException e)
         {
             // Transition to the error state and rethrow the exception.
             if (logger.isDebugEnabled())
-                logger.debug("Transition failed: state=" + state.getName()
-                        + " transition=" + transition.getName()
-                        + " actionType=" + actionType);
+                logger.debug("Transition failed: state={} transition={}  actionType={}",
+                        new Object[] {state.getName(),  transition.getName(), actionType});
 
             State errorState = map.getErrorState();
 
@@ -297,8 +294,8 @@ public class StateMachine
                     {
                         if (logger.isDebugEnabled())
                             logger
-                                    .debug("Executing entry action for error state: "
-                                            + errorState.getName());
+                                    .debug("Executing entry action for error state: {}",
+                                             errorState.getName());
                     }
                     errorStateEntryAction.doAction(event, entity, transition,
                             Action.ENTER_ACTION);
@@ -319,7 +316,7 @@ public class StateMachine
         if (state != nextState)
         {
             if (logger.isDebugEnabled())
-                logger.debug("Entering new state: " + nextState.getName());
+                logger.debug("Entering new state: {}", nextState.getName());
 
             State prevState = state;
             state = nextState;
