@@ -57,7 +57,7 @@ public interface Action<ET extends Entity>
      * @param actionType Type of action
      * @throws TransitionRollbackException Thrown if the state transition has failed
      *         and may be safely rolled back. 
-     * @throws TransitionFailedException Thrown if the state transition failed and 
+     * @throws TransitionFailureException Thrown if the state transition failed and
      *         state machine should move to default error state. 
      */
     public void doAction(Event message, ET entity, Transition transition,
