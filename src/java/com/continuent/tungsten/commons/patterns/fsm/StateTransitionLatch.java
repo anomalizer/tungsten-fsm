@@ -52,15 +52,15 @@ public class StateTransitionLatch<ET extends Entity>
             StateChangeListener<ET>
 {
     private final StateMachine<ET>   stateMachine;
-    private final State          expected;
+    private final State<ET>          expected;
     private final boolean        endOnError;
 
-    private State                errorState;
-    private State                current;
+    private State<ET>                errorState;
+    private State<ET>                current;
     private boolean              done;
     private boolean              reachedExpected;
     private boolean              reachedError;
-    private BlockingQueue<State> stateQueue = new LinkedBlockingQueue<State>();
+    private BlockingQueue<State<ET>> stateQueue = new LinkedBlockingQueue<State<ET>>();
 
     /**
      * Defines a new latch that waits for the the state machine to reach a
@@ -70,7 +70,7 @@ public class StateTransitionLatch<ET extends Entity>
      * @param expected State we are awaiting
      * @param endOnError If true, end if we reach the error state
      */
-    public StateTransitionLatch(StateMachine<ET> sm, State expected,
+    public StateTransitionLatch(StateMachine<ET> sm, State<ET> expected,
             boolean endOnError)
     {
         this.stateMachine = sm;
@@ -107,7 +107,7 @@ public class StateTransitionLatch<ET extends Entity>
      * Returns the current state. Synchronization ensures that this value is
      * correctly visible across threads.
      */
-    protected synchronized State getCurrent()
+    protected synchronized State<ET> getCurrent()
     {
         return current;
     }
@@ -116,7 +116,7 @@ public class StateTransitionLatch<ET extends Entity>
      * Sets the current state with synchronization to ensure visibility across
      * threads.
      */
-    protected synchronized void setCurrent(State state)
+    protected synchronized void setCurrent(State<ET> state)
     {
         this.current = state;
     }
@@ -125,8 +125,8 @@ public class StateTransitionLatch<ET extends Entity>
      * Enqueues a new state for examination by the latch.
      */
     @Override
-    public synchronized void stateChanged(ET entity, State oldState,
-            State newState)
+    public synchronized void stateChanged(ET entity, State<ET> oldState,
+            State<ET> newState)
     {
         stateQueue.add(newState);
     }
@@ -145,7 +145,7 @@ public class StateTransitionLatch<ET extends Entity>
      * 
      * @return Current state if successful or null
      */
-    public State call()
+    public State<ET> call()
     {
         try
         {

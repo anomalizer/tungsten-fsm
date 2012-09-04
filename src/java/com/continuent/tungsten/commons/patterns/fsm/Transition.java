@@ -70,7 +70,7 @@ public class Transition<ET extends Entity>
     	return name;
     }
 
-    public Guard getGuard()
+    public Guard<ET> getGuard()
     {
         return guard;
     }

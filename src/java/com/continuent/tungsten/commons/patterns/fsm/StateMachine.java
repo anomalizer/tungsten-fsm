@@ -301,7 +301,7 @@ public class StateMachine<ET extends Entity>
         {
             logger.debug("Entering new state: {}", nextState.getName());
 
-            State prevState = state;
+            State<ET> prevState = state;
             state = nextState;
 
             for (StateChangeListener<ET> listener : listeners)
@@ -338,7 +338,7 @@ public class StateMachine<ET extends Entity>
     /**
      * Returns the current state.
      */
-    public State getState()
+    public State<ET> getState()
     {
         return state;
     }
@@ -378,7 +378,7 @@ public class StateMachine<ET extends Entity>
     /**
      * Returns the error state of this state machine, if defined, or null.
      */
-    public State getErrorState()
+    public State<ET> getErrorState()
     {
         return this.map.getErrorState();
     }
@@ -386,7 +386,7 @@ public class StateMachine<ET extends Entity>
     /**
      * Creates a latch on a state in the state machine.
      */
-    public StateTransitionLatch<ET> createStateTransitionLatch(State expected,
+    public StateTransitionLatch<ET> createStateTransitionLatch(State<ET> expected,
             boolean exitOnError)
     {
         return new StateTransitionLatch<ET>(this, expected, exitOnError);

@@ -43,5 +43,5 @@ public interface StateChangeListener<ET extends Entity>
      * @param oldState Old state of entity
      * @param newState New state of entity
      */
-    public void stateChanged(ET entity, State oldState, State newState);
+    public void stateChanged(ET entity, State<ET> oldState, State<ET> newState);
 }

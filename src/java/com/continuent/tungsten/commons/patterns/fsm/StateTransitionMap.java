@@ -415,7 +415,7 @@ public class StateTransitionMap<ET extends Entity>
      *             the map has not been properly initialized by a call to
      *             {@link #build()}
      */
-    public Transition nextChainedTransition(State inputState, Event event,
+    public Transition<ET> nextChainedTransition(State inputState, Event event,
             ET entity) throws FiniteStateException
     {
         if (!initialized)
@@ -424,7 +424,7 @@ public class StateTransitionMap<ET extends Entity>
 
         State matchingState = inputState;
         boolean noMatcher = true;
-        Transition transition = null;
+        Transition<ET> transition = null;
 
         // Walk the state hierarchy looking for a transition that accepts this
         // event.
