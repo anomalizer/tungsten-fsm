@@ -163,11 +163,8 @@ public class StateMachine<ET extends Entity>
         // Find the next transition. This is guaranteed to be non-null.
         Transition<ET> transition = map.nextTransition(state, event, entity);
         State<ET> nextState = transition.getOutput();
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Executing state transition: input state={} transition={} output state={}",
-                    new Object[] {state.getName(), transition.getName(), nextState.getName()});
-        }
+        logger.debug("Executing state transition: input state={} transition={} output state={}",
+                new Object[] {state.getName(), transition.getName(), nextState.getName()});
 
         int actionType = -1;
         try
@@ -184,10 +181,8 @@ public class StateMachine<ET extends Entity>
                 // parent
                 // if it exists.
                 State<ET> exitState = state;
-                if (logger.isDebugEnabled())
-                    logger
-                            .debug("Searching for exit actions for current state: {}",
-                                    state.getName());
+                logger.debug("Searching for exit actions for current state: {}",
+                                state.getName());
 
                 while (exitState != null && exitState != leastCommonParent)
                 {
@@ -195,9 +190,8 @@ public class StateMachine<ET extends Entity>
                     {
                         Action<ET> exitAction = exitState.getExitAction();
                         actionType = Action.EXIT_ACTION;
-                        if (logger.isDebugEnabled())
-                            logger.debug("Executing exit action for state: {}",
-                                    exitState.getName());
+                        logger.debug("Executing exit action for state: {}",
+                                exitState.getName());
                         exitAction.doAction(event, entity, transition,
                                 actionType);
                     }
@@ -211,9 +205,8 @@ public class StateMachine<ET extends Entity>
             {
                 Action<ET> transitionAction = transition.getAction();
                 actionType = Action.TRANSITION_ACTION;
-                if (logger.isDebugEnabled())
-                    logger.debug("Executing action for transition: {}",
-                            transition.getName());
+                logger.debug("Executing action for transition: {}",
+                        transition.getName());
                 transitionAction
                         .doAction(event, entity, transition, actionType);
             }
@@ -221,9 +214,8 @@ public class StateMachine<ET extends Entity>
             // If we are transitioning to a new state look for entry actions.
             if (state != nextState)
             {
-                if (logger.isDebugEnabled())
-                    logger.debug("Searching for entry actions for next state: {}",
-                            nextState.getName());
+                logger.debug("Searching for entry actions for next state: {}",
+                        nextState.getName());
 
                 // Fire entry actions from the state below the least common
                 // parent (if there is one) to the next state itself.
@@ -250,9 +242,8 @@ public class StateMachine<ET extends Entity>
                     {
                         Action<ET> entryAction = entryState.getEntryAction();
                         actionType = Action.ENTER_ACTION;
-                        if (logger.isDebugEnabled())
-                            logger.debug("Executing entry action for state: {}",
-                                    entryState.getName());
+                        logger.debug("Executing entry action for state: {}",
+                                entryState.getName());
                         entryAction.doAction(event, entity, transition,
                                 actionType);
                     }
@@ -262,17 +253,15 @@ public class StateMachine<ET extends Entity>
         catch (TransitionRollbackException e)
         {
             // Log and rethrow a rollback exception.
-            if (logger.isDebugEnabled())
-                logger.debug("Transition rolled back: state={} transition={} actionType={}",
-                    new Object[] {state.getName(), transition.getName(), actionType});
+            logger.debug("Transition rolled back: state={} transition={} actionType={}",
+                new Object[] {state.getName(), transition.getName(), actionType});
             throw e;
         }
         catch (TransitionFailureException e)
         {
             // Transition to the error state and rethrow the exception.
-            if (logger.isDebugEnabled())
-                logger.debug("Transition failed: state={} transition={}  actionType={}",
-                        new Object[] {state.getName(),  transition.getName(), actionType});
+            logger.debug("Transition failed: state={} transition={}  actionType={}",
+                    new Object[] {state.getName(),  transition.getName(), actionType});
 
             State<ET> errorState = map.getErrorState();
 
@@ -290,13 +279,8 @@ public class StateMachine<ET extends Entity>
                 Action<ET> errorStateEntryAction = errorState.getEntryAction();
                 if (errorStateEntryAction != null)
                 {
-                    if (logger.isDebugEnabled())
-                    {
-                        if (logger.isDebugEnabled())
-                            logger
-                                    .debug("Executing entry action for error state: {}",
-                                             errorState.getName());
-                    }
+                    logger.debug("Executing entry action for error state: {}",
+                                     errorState.getName());
                     errorStateEntryAction.doAction(event, entity, transition,
                             Action.ENTER_ACTION);
                 }
@@ -315,8 +299,7 @@ public class StateMachine<ET extends Entity>
         // If we changed state, move to the new state and notify listeners.
         if (state != nextState)
         {
-            if (logger.isDebugEnabled())
-                logger.debug("Entering new state: {}", nextState.getName());
+            logger.debug("Entering new state: {}", nextState.getName());
 
             State prevState = state;
             state = nextState;
