@@ -154,7 +154,7 @@ public class State<ET extends Entity>
     /**
      * Returns fully qualified name of the state including any parent states.
      */
-    public String getName()
+    public final String getName()
     {
         return qualifiedName;
     }
@@ -162,7 +162,7 @@ public class State<ET extends Entity>
     /**
      * Returns the name of this state without any parent names.
      */
-    public String getBaseName()
+    public final String getBaseName()
     {
         return name;
     }

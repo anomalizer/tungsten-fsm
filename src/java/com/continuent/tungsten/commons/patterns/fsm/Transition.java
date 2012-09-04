@@ -65,7 +65,7 @@ public class Transition<ET extends Entity>
     	this("none", guard, input, action, output);
     }
 
-    public String getName()
+    public final String getName()
     {
     	return name;
     }
