@@ -34,7 +34,7 @@ package com.continuent.tungsten.commons.patterns.fsm;
  * @author <a href="mailto:robert.hodges@continuent.com">Robert Hodges</a>
  * @version 1.0
  */
-public interface Action
+public interface Action<ET extends Entity>
 {
     /** An action executed on leaving a state. */
     public static final int EXIT_ACTION       = 1;
@@ -60,6 +60,6 @@ public interface Action
      * @throws TransitionFailedException Thrown if the state transition failed and 
      *         state machine should move to default error state. 
      */
-    public void doAction(Event message, Entity entity, Transition transition, 
+    public void doAction(Event message, ET entity, Transition transition,
             int actionType) throws TransitionRollbackException, TransitionFailureException;
 }

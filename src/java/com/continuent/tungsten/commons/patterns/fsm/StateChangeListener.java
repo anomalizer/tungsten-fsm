@@ -29,7 +29,7 @@ package com.continuent.tungsten.commons.patterns.fsm;
  * @author <a href="mailto:robert.hodges@continuent.com">Robert Hodges</a>
  * @version 1.0
  */
-public interface StateChangeListener
+public interface StateChangeListener<ET extends Entity>
 {
     /**
      * Called to indicate a state change.  Implementation should be 
@@ -43,5 +43,5 @@ public interface StateChangeListener
      * @param oldState Old state of entity
      * @param newState New state of entity
      */
-    public void stateChanged(Entity entity, State oldState, State newState);
+    public void stateChanged(ET entity, State oldState, State newState);
 }

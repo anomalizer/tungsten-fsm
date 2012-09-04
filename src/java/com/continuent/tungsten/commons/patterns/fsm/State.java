@@ -35,17 +35,17 @@ import java.util.List;
  * @author <a href="mailto:robert.hodges@continuent.com">Robert Hodges</a>
  * @version 1.0
  */
-public class State
+public class State<ET extends Entity>
 {
     private final String    name;
     private final StateType type;
-    private final State     parent;
-    private final Action    entryAction;
-    private final Action    exitAction;
+    private final State<ET>     parent;
+    private final Action<ET>    entryAction;
+    private final Action<ET>    exitAction;
 
     private final String    qualifiedName;
-    private final State[]   hierarchy;
-    private List<State>     children = new ArrayList<State>();
+    private final State<ET>[]   hierarchy;
+    private List<State<ET>>     children = new ArrayList<State<ET>>();
 
     /**
      * Creates a new state.
@@ -57,8 +57,8 @@ public class State
      * @param entryAction An action to perform on entering the state
      * @param exitAction An action to perform on leaving the state
      */
-    public State(String name, StateType type, State parent, Action entryAction,
-            Action exitAction)
+    public State(String name, StateType type, State<ET> parent, Action<ET> entryAction,
+            Action<ET> exitAction)
     {
         this.name = name;
         this.type = type;
@@ -70,13 +70,14 @@ public class State
         if (parent == null)
         {
             this.qualifiedName = name;
-            this.hierarchy = new State[]{this};
+            @SuppressWarnings("unchecked") final State<ET>[] tmp = new State[]{this};
+            this.hierarchy = tmp;
         }
         else
         {
             this.qualifiedName = parent.getName() + ":" + name;
-            State[] parentArray = parent.getHierarchy();
-            State[] selfArray = new State[parentArray.length + 1];
+            State<ET>[] parentArray = parent.getHierarchy();
+            @SuppressWarnings("unchecked") State<ET>[] selfArray = new State[parentArray.length + 1];
             for (int i = 0; i < parentArray.length; i++)
                 selfArray[i] = parentArray[i];
             selfArray[selfArray.length - 1] = this;
@@ -92,8 +93,8 @@ public class State
     /**
      * Utility method for creating a new state without a parent.
      */
-    public State(String name, StateType type, Action entryAction,
-            Action exitAction)
+    public State(String name, StateType type, Action<ET> entryAction,
+            Action<ET> exitAction)
     {
         this(name, type, null, entryAction, exitAction);
     }
@@ -109,7 +110,7 @@ public class State
     /**
      * Utility method for creating a new state without actions.
      */
-    public State(String name, StateType type, State parent)
+    public State(String name, StateType type, State<ET> parent)
     {
         this(name, type, parent, null, null);
     }
@@ -120,7 +121,7 @@ public class State
      * 
      * @param state Child state
      */
-    void addChild(State state)
+    void addChild(State<ET> state)
     {
         children.add(state);
     }
@@ -129,7 +130,7 @@ public class State
      * Returns an immutable list of the children of this state. The list is
      * empty if there are no children.
      */
-    public List<State> getChildren()
+    public List<State<ET>> getChildren()
     {
         return Collections.unmodifiableList(children);
     }
@@ -137,7 +138,7 @@ public class State
     /**
      * Returns the entry action or null if there is none.
      */
-    public Action getEntryAction()
+    public Action<ET> getEntryAction()
     {
         return entryAction;
     }
@@ -145,7 +146,7 @@ public class State
     /**
      * Returns the exit action or null if there is none.
      */
-    public Action getExitAction()
+    public Action<ET> getExitAction()
     {
         return exitAction;
     }
@@ -185,7 +186,7 @@ public class State
      * Returns the immediately enclosing state or null if this is not a
      * sub-state.
      */
-    public State getParent()
+    public State<ET> getParent()
     {
         return parent;
     }
@@ -194,7 +195,7 @@ public class State
      * s Returns the state hierarchy from the highest enclosing state, if any,
      * down to this state.
      */
-    public State[] getHierarchy()
+    public State<ET>[] getHierarchy()
     {
         return hierarchy;
     }
@@ -224,10 +225,10 @@ public class State
      * Returns the lowest shared parent of the other state or null if these
      * states have no common parent.
      */
-    public State getLeastCommonParent(State other)
+    public State<ET> getLeastCommonParent(State<ET> other)
     {
-        State least = null;
-        State[] otherHierarchy = other.getHierarchy();
+        State<ET> least = null;
+        State<ET>[] otherHierarchy = other.getHierarchy();
         for (int i = 0; i < hierarchy.length; i++)
         {
 

@@ -29,13 +29,13 @@ package com.continuent.tungsten.commons.patterns.fsm;
  * @author <a href="mailto:robert.hodges@continuent.com">Robert Hodges</a>
  * @version 1.0
  */
-public class Transition
+public class Transition<ET extends Entity>
 {
 	private final String name;
-    private final Guard  guard;
-    private final State  input;
-    private final Action action;
-    private final State  output;
+    private final Guard<ET>  guard;
+    private final State<ET>  input;
+    private final Action<ET> action;
+    private final State<ET>  output;
 
     /**
      * Creates a new transition instance.
@@ -46,8 +46,8 @@ public class Transition
      * @param action An action to take when the transition is triggered
      * @param output Output state
      */
-    public Transition(String name, Guard guard, State input, Action action,
-			State output) 
+    public Transition(String name, Guard<ET> guard, State<ET> input, Action<ET> action,
+			State<ET> output)
     {
 		this.name = name;
 		this.guard = guard;
@@ -59,8 +59,8 @@ public class Transition
     /**
      * Creates a new transition instance with a default name "none". 
      */
-    public Transition(Guard guard, State input, Action action,
-			State output) 
+    public Transition(Guard<ET> guard, State<ET> input, Action<ET> action,
+			State<ET> output)
     {
     	this("none", guard, input, action, output);
     }
@@ -75,17 +75,17 @@ public class Transition
         return guard;
     }
 
-    public State getInput()
+    public State<ET> getInput()
     {
         return input;
     }
 
-    public Action getAction()
+    public Action<ET> getAction()
     {
         return action;
     }
 
-    public State getOutput()
+    public State<ET> getOutput()
     {
         return output;
     }
@@ -93,7 +93,7 @@ public class Transition
     /**
      * Returns true if the guard class accepts this event.
      */
-    public boolean accept(Event event, Entity entity)
+    public boolean accept(Event event, ET entity)
     {
         return guard.accept(event, entity, input);
     }

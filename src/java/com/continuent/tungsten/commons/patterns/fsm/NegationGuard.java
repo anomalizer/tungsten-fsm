@@ -29,16 +29,16 @@ package com.continuent.tungsten.commons.patterns.fsm;
  * @author <a href="mailto:robert.hodges@continuent.com">Robert Hodges</a>
  * @version 1.0
  */
-public class NegationGuard implements Guard
+public class NegationGuard<ET extends Entity> implements Guard<ET>
 {
-    private final Guard guard;
+    private final Guard<ET> guard;
 
     /**
      * Creates a new instance.
      * 
      * @param guard Guard whose value will be negated
      */
-    public NegationGuard(Guard guard)
+    public NegationGuard(Guard<ET> guard)
     {
         this.guard = guard;
     }
@@ -51,7 +51,8 @@ public class NegationGuard implements Guard
      *      com.continuent.tungsten.commons.patterns.fsm.Entity,
      *      com.continuent.tungsten.commons.patterns.fsm.State)
      */
-    public boolean accept(Event message, Entity entity, State state)
+    @Override
+    public boolean accept(Event message, ET entity, State state)
     {
         return (!guard.accept(message, entity, state));
     }

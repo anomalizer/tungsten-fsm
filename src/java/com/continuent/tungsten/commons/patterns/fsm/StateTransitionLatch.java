@@ -46,12 +46,12 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author <a href="mailto:robert.hodges@continuent.com">Robert Hodges</a>
  * @version 1.0
  */
-public class StateTransitionLatch
+public class StateTransitionLatch<ET extends Entity>
         implements
             Callable<State>,
-            StateChangeListener
+            StateChangeListener<ET>
 {
-    private final StateMachine   stateMachine;
+    private final StateMachine<ET>   stateMachine;
     private final State          expected;
     private final boolean        endOnError;
 
@@ -70,7 +70,7 @@ public class StateTransitionLatch
      * @param expected State we are awaiting
      * @param endOnError If true, end if we reach the error state
      */
-    public StateTransitionLatch(StateMachine sm, State expected,
+    public StateTransitionLatch(StateMachine<ET> sm, State expected,
             boolean endOnError)
     {
         this.stateMachine = sm;
@@ -124,7 +124,8 @@ public class StateTransitionLatch
     /**
      * Enqueues a new state for examination by the latch.
      */
-    public synchronized void stateChanged(Entity entity, State oldState,
+    @Override
+    public synchronized void stateChanged(ET entity, State oldState,
             State newState)
     {
         stateQueue.add(newState);

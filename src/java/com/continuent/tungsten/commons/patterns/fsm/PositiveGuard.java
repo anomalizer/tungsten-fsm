@@ -29,12 +29,13 @@ package com.continuent.tungsten.commons.patterns.fsm;
  * @author <a href="mailto:robert.hodges@continuent.com">Robert Hodges</a>
  * @version 1.0
  */
-public class PositiveGuard implements Guard
+public class PositiveGuard<ET extends Entity> implements Guard<ET>
 {
     /**
      * Accepts any event. {@inheritDoc}
      */
-    public boolean accept(Event message, Entity entity, State state)
+    @Override
+    public boolean accept(Event message, ET entity, State state)
     {
         return true;
     }
