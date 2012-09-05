@@ -29,7 +29,7 @@ package com.continuent.tungsten.commons.patterns.fsm;
  * @author <a href="mailto:robert.hodges@continuent.com">Robert Hodges</a>
  * @version 1.0
  */
-public interface Guard<ET extends Entity>
+public interface Guard<EntityType extends Entity, EventType>
 {
     /**
      * Returns true if the message is accepted and we should take the transition
@@ -40,5 +40,5 @@ public interface Guard<ET extends Entity>
      * @param state The current entity state
      * @return true if the message is accepted
      */
-    public boolean accept(Event message, ET entity, State state);
+    public boolean accept(Event<EventType> message, EntityType entity, State<?> state);
 }

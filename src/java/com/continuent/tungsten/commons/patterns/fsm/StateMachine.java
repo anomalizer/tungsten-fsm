@@ -145,7 +145,7 @@ public class StateMachine<ET extends Entity>
      *             back cleanly by action code
      * @throws FiniteStateException Thrown if a generic error occurs
      */
-    public synchronized void applyEvent(Event event)
+    public synchronized <T> void applyEvent(Event<T> event)
             throws FiniteStateException
     {
         TransitionFailureException deferredException = null;
@@ -161,7 +161,7 @@ public class StateMachine<ET extends Entity>
         }
 
         // Find the next transition. This is guaranteed to be non-null.
-        Transition<ET> transition = map.nextTransition(state, event, entity);
+        Transition<ET, ?> transition = map.nextTransition(state, event, entity);
         State<ET> nextState = transition.getOutput();
         logger.debug("Executing state transition: input state={} transition={} output state={}",
                 new Object[] {state.getName(), transition.getName(), nextState.getName()});

@@ -6,7 +6,7 @@
     <groupId>com.continuent.tungsten-commons</groupId>
     <artifactId>tungsten-fsm</artifactId>
     <packaging>jar</packaging>
-    <version>0.4.0</version>
+    <version>0.5.0</version>
     <name>tungsten-fsm</name>
 
     <url>https://github.com/anomalizer/tungsten-fsm</url>

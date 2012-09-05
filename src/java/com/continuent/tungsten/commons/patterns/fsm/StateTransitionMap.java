@@ -160,7 +160,7 @@ public class StateTransitionMap<ET extends Entity>
      * @param transition A transition between two states containin a guard
      * @throws FiniteStateException Thrown if the transition is invalid
      */
-    public Transition<ET> addTransition(Transition<ET> transition)
+    public <T> Transition<ET, T> addTransition(Transition<ET, T> transition)
             throws FiniteStateException
     {
         // Check for errors.
@@ -187,10 +187,10 @@ public class StateTransitionMap<ET extends Entity>
      * @param action An action to take when the transition is triggered
      * @param output Output state
      */
-    public Transition<ET> addTransition(String name, Guard<ET> guard, State<ET> input,
+    public <T> Transition<ET, ?> addTransition(String name, Guard<ET, T> guard, State<ET> input,
             Action<ET> action, State<ET> output) throws FiniteStateException
     {
-        return addTransition(new Transition<ET>(name, guard, input, action, output));
+        return addTransition(new Transition<ET, T>(name, guard, input, action, output));
     }
 
     /**
@@ -202,10 +202,10 @@ public class StateTransitionMap<ET extends Entity>
      * @param action An action to take when the transition is triggered
      * @param output Output state
      */
-    public Transition<ET> addTransition(String name, String regex, State<ET> input,
+    public Transition<ET, ?> addTransition(String name, String regex, State<ET> input,
             Action<ET> action, State<ET> output) throws FiniteStateException
     {
-        return addTransition(new Transition<ET>(name, new RegexGuard<ET>(regex), input,
+        return addTransition(new Transition<ET, String>(name, new RegexGuard<ET>(regex), input,
                 action, output));
     }
 
@@ -218,12 +218,12 @@ public class StateTransitionMap<ET extends Entity>
      * @param action An action to take when the transition is triggered
      * @param output Output state
      */
-    public Transition<ET> addTransition(String name, Class<? extends Event> eventType,
+    public Transition<ET, ?> addTransition(String name, Class<? extends Event> eventType,
             State<ET> input, Action<ET> action, State<ET> output)
             throws FiniteStateException
     {
-        return addTransition(new Transition<ET>(name,
-                new EventTypeGuard<ET>(eventType), input, action, output));
+        return addTransition(new Transition<ET, Class<? extends Event>>(name,
+                new EventTypeGuard<ET, Class<? extends Event>>(eventType), input, action, output));
     }
 
     /**
@@ -360,7 +360,7 @@ public class StateTransitionMap<ET extends Entity>
      *             the map has not been properly initialized by a call to
      *             {@link #build()}
      */
-    public Transition<ET> nextTransition(State<ET> inputState, Event event,
+    public Transition<ET, ?> nextTransition(State<ET> inputState, Event<?> event,
             ET entity) throws FiniteStateException
     {
         if (!initialized)
@@ -369,7 +369,7 @@ public class StateTransitionMap<ET extends Entity>
 
         State<ET> matchingState = inputState;
         boolean noMatcher = true;
-        Transition<ET> transition = null;
+        Transition<ET, ?> transition = null;
 
         // Walk the state hierarchy looking for a transition that accepts this
         // event.
@@ -415,7 +415,7 @@ public class StateTransitionMap<ET extends Entity>
      *             the map has not been properly initialized by a call to
      *             {@link #build()}
      */
-    public Transition<ET> nextChainedTransition(State inputState, Event event,
+    public Transition<ET, ?> nextChainedTransition(State<ET> inputState, Event<?> event,
             ET entity) throws FiniteStateException
     {
         if (!initialized)
@@ -424,7 +424,7 @@ public class StateTransitionMap<ET extends Entity>
 
         State matchingState = inputState;
         boolean noMatcher = true;
-        Transition<ET> transition = null;
+        Transition<ET, ?> transition = null;
 
         // Walk the state hierarchy looking for a transition that accepts this
         // event.

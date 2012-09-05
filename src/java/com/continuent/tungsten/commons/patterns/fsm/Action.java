@@ -60,6 +60,6 @@ public interface Action<ET extends Entity>
      * @throws TransitionFailureException Thrown if the state transition failed and
      *         state machine should move to default error state. 
      */
-    public void doAction(Event message, ET entity, Transition<ET> transition,
+    public void doAction(Event<?> message, ET entity, Transition<ET, ?> transition,
             int actionType) throws TransitionRollbackException, TransitionFailureException;
 }

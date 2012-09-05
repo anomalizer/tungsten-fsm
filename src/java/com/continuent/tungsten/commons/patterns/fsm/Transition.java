@@ -29,10 +29,10 @@ package com.continuent.tungsten.commons.patterns.fsm;
  * @author <a href="mailto:robert.hodges@continuent.com">Robert Hodges</a>
  * @version 1.0
  */
-public class Transition<ET extends Entity>
+public class Transition<ET extends Entity, EventType>
 {
 	private final String name;
-    private final Guard<ET>  guard;
+    private final Guard<ET, EventType>  guard;
     private final State<ET>  input;
     private final Action<ET> action;
     private final State<ET>  output;
@@ -46,7 +46,7 @@ public class Transition<ET extends Entity>
      * @param action An action to take when the transition is triggered
      * @param output Output state
      */
-    public Transition(String name, Guard<ET> guard, State<ET> input, Action<ET> action,
+    public Transition(String name, Guard<ET, EventType> guard, State<ET> input, Action<ET> action,
 			State<ET> output)
     {
 		this.name = name;
@@ -59,7 +59,7 @@ public class Transition<ET extends Entity>
     /**
      * Creates a new transition instance with a default name "none". 
      */
-    public Transition(Guard<ET> guard, State<ET> input, Action<ET> action,
+    public Transition(Guard<ET, EventType> guard, State<ET> input, Action<ET> action,
 			State<ET> output)
     {
     	this("none", guard, input, action, output);
@@ -70,7 +70,7 @@ public class Transition<ET extends Entity>
     	return name;
     }
 
-    public Guard<ET> getGuard()
+    public Guard<ET, EventType> getGuard()
     {
         return guard;
     }
@@ -93,7 +93,7 @@ public class Transition<ET extends Entity>
     /**
      * Returns true if the guard class accepts this event.
      */
-    public boolean accept(Event event, ET entity)
+    public boolean accept(Event<EventType> event, ET entity)
     {
         return guard.accept(event, entity, input);
     }
