@@ -148,7 +148,7 @@ public class StateMachine<ET extends Entity>
      *             back cleanly by action code
      * @throws FiniteStateException Thrown if a generic error occurs
      */
-    public synchronized <T> void applyEvent(Event<T> event)
+    public synchronized void applyEvent(Event<?> event)
             throws FiniteStateException
     {
         TransitionFailureException deferredException = null;
