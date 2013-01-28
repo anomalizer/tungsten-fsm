@@ -49,14 +49,14 @@ public class TransitionMatcher<ET extends Entity>
         return transitions;
     }
 
-    public <T> Transition<ET, ?> matchTransition(Event<T> event, ET entity)
+    public <T> Transition<ET, T> matchTransition(Event<T> event, ET entity)
     {
         for (Transition<ET, ?> transition : transitions)
         {
             @SuppressWarnings("unchecked") Transition<ET, T> unsafeCast = (Transition<ET, T>) transition;
             if (unsafeCast.accept(event, entity))
             {
-                return transition;
+                return unsafeCast;
             }
         }
         return null;
