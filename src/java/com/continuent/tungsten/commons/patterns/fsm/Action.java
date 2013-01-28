@@ -53,6 +53,7 @@ public interface Action<ET extends Entity>
      * to roll back.  Unhandled exceptions are passed back up the stack; state
      * machine behavior in this case is undefined.  
      * 
+     *
      * @param message Event that triggered the transition
      * @param entity Entity whose state is changing
      * @param transition Transition we are executing
@@ -62,6 +63,8 @@ public interface Action<ET extends Entity>
      * @throws TransitionFailureException Thrown if the state transition failed and
      *         state machine should move to default error state. 
      */
-    public void doAction(Event<?> message, ET entity, Transition<ET, ?> transition,
-            int actionType) throws TransitionRollbackException, TransitionFailureException;
+    public void doAction(Event<?> message, ET entity,
+                                     Transition<ET, ?> transition,
+                                     int actionType)
+            throws TransitionRollbackException, TransitionFailureException;
 }

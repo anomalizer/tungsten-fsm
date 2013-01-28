@@ -28,11 +28,11 @@ package com.continuent.tungsten.commons.patterns.fsm;
  * @author <a href="mailto:robert.hodges@continuent.com">Robert Hodges</a>
  * @version 1.0
  */
-public class EventTypeGuard<ET extends Entity, EventType> implements Guard<ET, EventType>
+public class EventTypeGuard<ET extends Entity> implements Guard<ET, Object>
 {
     private final Class<? extends Event> type;
 
-    public EventTypeGuard(Class<? extends Event> type)
+    public EventTypeGuard(Class<? extends Event<?>> type)
     {
         this.type = type;
     }
@@ -45,7 +45,7 @@ public class EventTypeGuard<ET extends Entity, EventType> implements Guard<ET, E
      * @see com.continuent.tungsten.commons.patterns.fsm.Guard#accept(com.continuent.tungsten.commons.patterns.fsm.Event, com.continuent.tungsten.commons.patterns.fsm.Entity, com.continuent.tungsten.commons.patterns.fsm.State)
      */
     @Override
-    public boolean accept(Event<EventType> message, ET entity, State<?> state)
+    public boolean accept(Event<Object> message, ET entity, State<?> state)
     {
         return (type.isInstance(message));
     }

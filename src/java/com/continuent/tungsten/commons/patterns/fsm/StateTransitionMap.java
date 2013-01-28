@@ -190,7 +190,7 @@ public class StateTransitionMap<ET extends Entity>
      * @param action An action to take when the transition is triggered
      * @param output Output state
      */
-    public <T> Transition<ET, ?> addTransition(String name, Guard<ET, T> guard, State<ET> input,
+    public <T> Transition<ET, T> addTransition(String name, Guard<ET, T> guard, State<ET> input,
             Action<ET> action, State<ET> output) throws FiniteStateException
     {
         return addTransition(new Transition<ET, T>(name, guard, input, action, output));
@@ -205,7 +205,7 @@ public class StateTransitionMap<ET extends Entity>
      * @param action An action to take when the transition is triggered
      * @param output Output state
      */
-    public Transition<ET, ?> addTransition(String name, String regex, State<ET> input,
+    public Transition<ET, String> addTransition(String name, String regex, State<ET> input,
             Action<ET> action, State<ET> output) throws FiniteStateException
     {
         return addTransition(new Transition<ET, String>(name, new RegexGuard<ET>(regex), input,
@@ -221,12 +221,12 @@ public class StateTransitionMap<ET extends Entity>
      * @param action An action to take when the transition is triggered
      * @param output Output state
      */
-    public Transition<ET, ?> addTransition(String name, Class<? extends Event> eventType,
+    public Transition<ET, Object> addTransition(String name, Class<? extends Event<?>> eventType,
             State<ET> input, Action<ET> action, State<ET> output)
             throws FiniteStateException
     {
-        return addTransition(new Transition<ET, Class<? extends Event>>(name,
-                new EventTypeGuard<ET, Class<? extends Event>>(eventType), input, action, output));
+        return addTransition(new Transition<ET, Object>(name,
+                new EventTypeGuard<ET>(eventType), input, action, output));
     }
 
     /**
