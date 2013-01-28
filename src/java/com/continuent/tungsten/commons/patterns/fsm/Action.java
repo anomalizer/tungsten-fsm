@@ -30,7 +30,9 @@ package com.continuent.tungsten.commons.patterns.fsm;
  * <li>TRANSITION_ACTION - Action taken on traversing a transition</li>
  * <li>ENTRY_ACTION - Action taken on entering a state</li>
  * </ul>
- * 
+ *
+ * @param <ET> The entity type of the FSM that thia action is associated with
+ *
  * @author <a href="mailto:robert.hodges@continuent.com">Robert Hodges</a>
  * @version 1.0
  */

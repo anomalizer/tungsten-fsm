@@ -25,6 +25,10 @@ package com.continuent.tungsten.commons.patterns.fsm;
 /**
  * Defines a transition between two states with an accompanying guard that
  * determines when the transition can be applied.
+ *
+ * @param <ET> The entity type of the overall FSM
+ * @param <EventType> The type of the optional satellite data associated with
+ *                   the specific event that triggers this transition
  * 
  * @author <a href="mailto:robert.hodges@continuent.com">Robert Hodges</a>
  * @version 1.0

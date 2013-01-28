@@ -31,7 +31,10 @@ import java.util.List;
  * state name, a state type, an optional parent state, and entry and exit
  * actions. Sub-states are those states that have a parent state that encloses
  * them.
- * 
+ *
+ * @param <ET> The specific entity type for which this state in the state
+ *            machine is being defined
+ *
  * @author <a href="mailto:robert.hodges@continuent.com">Robert Hodges</a>
  * @version 1.0
  */

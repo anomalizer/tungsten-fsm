@@ -25,7 +25,10 @@ package com.continuent.tungsten.commons.patterns.fsm;
 /**
  * Provides an adapter that permits ordinary objects to be handled as entities
  * without implementing the Entity interface directly.
- * 
+ *
+ * @param <T> The type of the object that is being wrapped to comply
+ *           with the entity interface
+ *
  * @author <a href="mailto:robert.hodges@continuent.com">Robert Hodges</a>
  * @version 1.0
  */

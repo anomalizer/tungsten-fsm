@@ -26,6 +26,9 @@ import java.util.HashMap;
 
 /**
  * Manages the map of states and transitions composing a finite state machine.
+ *
+ * @param <ET> The entity type of the FSM whose transition map this object
+ *            defines
  * 
  * @author <a href="mailto:robert.hodges@continuent.com">Robert Hodges</a>
  * @version 1.0

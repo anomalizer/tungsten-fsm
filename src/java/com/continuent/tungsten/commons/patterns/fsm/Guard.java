@@ -25,7 +25,14 @@ package com.continuent.tungsten.commons.patterns.fsm;
 /**
  * Denotes a class used to determine whether the conditions for a workflow
  * transition have been met.
- * 
+ *
+ * @param <EntityType> The entity type of the FSM whose transition this
+ *                    guard is a part of
+ *
+ * @param <EventType> The type of the optional satellite data associated with
+ *                   the specific event that triggers the transition that this
+ *                   guard is associated with
+ *
  * @author <a href="mailto:robert.hodges@continuent.com">Robert Hodges</a>
  * @version 1.0
  */

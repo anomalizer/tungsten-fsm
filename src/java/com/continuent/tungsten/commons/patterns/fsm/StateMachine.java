@@ -80,7 +80,10 @@ import org.slf4j.LoggerFactory;
  * of exceptions to signal error conditions both large and small. There is also
  * a default error state that will
  * <p>
- * 
+ *
+ * @param <ET> The entity type for which the state machine is being defined
+ *            All member states in a given FSM must be for the same entity type
+ *
  * @author <a href="mailto:robert.hodges@continuent.com">Robert Hodges</a>
  * @version 1.0
  */
