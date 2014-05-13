@@ -39,5 +39,5 @@ public interface Guard
      * @param state The current entity state
      * @return true if the message is accepted
      */
-    public boolean accept(Event message, Entity entity, State state);
+    public <EventType> boolean accept(Event<EventType> message, Entity entity, State state);
 }
