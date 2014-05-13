@@ -1,0 +1,535 @@
+Introduction to State Machine Design with FSM
+
+Robert Hodges - Continuent, Inc.
+10 December 2010
+
+State machine design is a technique for describing the behavior of
+programs that receive input from outside sources as a set of inputs,
+states, transitions, and actions. State machines are fundamental
+building blocks in the theory of finite automata as well as distributed
+computing. They are widely used in the design of distributed and
+real-time systems.
+
+One big advantage of state machines is that they help enforce
+deterministic behavior when there are concurrent inputs to the
+system. Well-designed state machines also help avoid unexpected
+corner cases when an input arrives for a system that is not in the
+correct state to receive it. A simple example is a request to enable
+a network service is already being enabled. In this case we would
+simply ignore the new input. Failing to handle such requests correctly
+can lead to difficult-to-reproduce bugs that cause systems to crash
+or corrupt data.
+
+The Finite State Machine (FSM) Library is based on the state diagram
+model used by UML State Diagrams, which in turn are based on Harel
+State Charts. The library allows you to define and operate simple
+state machines within Java programs.  Accessing State Machine Library
+Code
+
+The Finite State Machine Library is published on SourceForge.net.
+You can download source and binary builds from the Tungsten project
+[[1]].
+
+The state machine library is part of a broader set of utilities used by 
+the Tungsten architecture. State machine code is in package 
+com.continuent.tungsten.commons.patterns.fsm.
+
+How Does the State Machine Library Work?
+
+Overview
+
+State machines track the state of Java instances. State machines
+manage changes to instance state and ensure that only one change
+can be processed at a time. A Java instance that is so managed must
+implement the Entity interface. You can also use a helper class
+called EntityAdapter that stores an arbitrary Java Object.
+
+To use the state machine library, you first need to define a state
+model for the Entity. For example, suppose you are implementing a
+network file service that has four main states:
+
+    * INITIALIZING
+    * OFFLINE
+    * ONLINE
+    * TERMINATED 
+
+You might implement a Java class called "ServiceRuntime" that stores
+state information for the file service. There is an instance of
+this class for each running file service. You can now define and
+use a state machine to ensure that the state data in instance
+ServiceRuntime changes in well-defined ways.
+
+To use state machines, you must define events, which are inputs to
+your state machine. You could design the following events for the
+state machine:
+
+    * START. Starts the service up from the initializing state, sending it to off-line.
+    * ENABLE. Puts an offline service in the online state.
+    * DISABLE. Puts an online service in the offline state.
+    * HALT. Shuts down the service nicely if it is in the offline state.
+    * KILL. Shuts down the service with minimal clean-up no matter what state it is in. 
+
+As you can see, using state machines forces you to define inputs
+exactly, including when they are processed and exactly what happens
+at that time.  
+
+State Transition Maps
+
+State transition maps are like class definitions for state machines.
+They define the list of states and transitions found in a running
+state machine.
+
+State transition maps are represented by class StateTransitionMap.
+The first step in using state machines is typically to define a
+state machine map, load up states and transitions, and call the
+map's build() method.
+
+Here is a simple example.
+
+StateTransitionMap map = new StateTransitionMap();
+State start = new State("START", StateType.START);
+State end = new State("END", StateType.END);
+Transition transition = new Transition("START-TO-END",
+        new PositiveGuard(), start, nullAction, end);
+map.addState(start);
+map.addState(end);
+map.addTransition(transition);
+map.build();
+
+The build() method checks for obvious problems with the state
+diagram, such as unreachable states. The build method is equivalent
+to compiling the state map so that it can be used for generating
+state diagrams.  
+
+States
+
+States correspond to a configuration of the Java instance that your
+state machine describes. The state machine library supplies a class
+called State that you use to define states in the state map. There
+are three kinds of states:
+
+    * START state. Every state machine must have one start state. The state machine goes into this state automatically when it starts.
+    * END state. Every state machine must have at least one end state. The end state terminates the state machine.
+    * ACTIVE state. Every state machine may have operational states that are neither start nor end states. 
+
+Every state must be reachable in the state machine by following
+transitions from the start state. Every state that is not an end
+state must have at least one exiting transition.
+
+States can be associated with actions, which will be described
+shortly. For each state you can specify an action to invoke when
+the state machine enters the state. Similarly, you can specify an
+action to invoke when leaving the state. These actions are optional.
+
+The following example shows states suitable for the network service.
+
+stmap = new StateTransitionMap();
+State initializing = new State("INITIALIZING", StateType.START);
+State offline = new State("OFFLINE", StateType.ACTIVE);
+State online = new State("ONLINE", StateType.ACTIVE);
+State terminated = new State("TERMINATED", StateType.END);
+stmap.addState(initializing);
+stmap.addState(offline);
+stmap.addState(online);
+stmap.addState(terminated);
+
+Sub-States
+
+Sub-states are states within other states. For example, an OFFLINE
+state might have two sub-states depending on whether it is offline
+due to a user action or offline due to a failure. These could be
+named NORMAL and ERROR respectively. The enclosing OFFLINE state
+is called a parent state. Sub-state names are formed by listing the
+top-most parent down to the name of the sub-state itself, for example
+OFFLINE:NORMAL.
+
+The following example shows how to define substates:
+
+State offline = new State("OFFLINE", StateType.ACTIVE);
+State offlineNormal = new State("NORMAL", StateType.ACTIVE, offline);
+State offlineError = new State("ERROR", StateType.ACTIVE, offline,
+       errorShutdownAction, errorClearAction);
+
+stmap.addState(start);
+stmap.addState(offline);
+stmap.addState(offlineNormal);
+
+Sub-states can have their own state transitions just like any other
+state. However, they also automatically share all outbound transitions
+from their parent state.
+
+Error State
+
+Each state machine map may define an error state. The state machine
+will transfer into the error state on certain errors, which are
+discussed below. The following example shows how to set the error
+state.
+
+stmap.setErrorState(offlineError);
+
+Actions
+
+Actions are procedures invoked at various points in the life of a
+state machine. Actions are how you get work done using state machines.
+The trick with state machine programming is to submit inputs to
+your state machine and let the library decide when to call the
+actions. Actions will only run when appropriate based on the input
+event and the current state of your state machine.
+
+Actions are Java classes that implement the Action interface. You
+can define actions quite easily as shown in the example below.
+
+public class goOfflineAction implements Action
+{
+    public void doAction(Event event, Entity entity, Transition transition,
+            int actionType) throws TransitionRollbackException
+    {
+        // Issue a cancel call to the service runtime.  
+        ServiceRuntime runtime = (ServiceRuntime) entity; 
+        runtime.cancel();
+    }
+}
+
+The procedural logic is in the doAction() method. The method
+invocation supplies all information known to the state machine when
+the action is invoked, including the event that caused the transition,
+the entity (Java instance) whose state we are managing, and the
+definition of the transition. This should be plenty of information
+to write correctly functioning code.
+
+Actions should be reasonably fast, as only one Action ever runs at
+a time against a single Entity. If you need to do something that
+takes a long time, it is better to create a state that corresponds
+to performing the task, such as GOING-OFFLINE, and start a thread
+to perform it. When the task completes, it sends an Event to the
+state machine to move it into the new state, such as OFFLINE.
+
+Guards and Transitions
+
+Transitions provide the link between states and are implemented by
+the Transition class. Transition instances have 5 parts:
+
+    * A name that distinguishes the transition. The name is not required but is very helpful for debugging.
+    * A Guard that checks to see if the transition should be taken. Guards are described in the next section.
+    * An input State. The transition may only be taken from this state.
+    * An Action to perform. This Action is executed when taking the transition.
+    * An output State. This is the state of the state machine after the transition has successfully executed. 
+
+Guards implement conditional logic to decide whether the combination
+of event and state is accepted. The following class implements a
+check that the Event instance has a particular type. It is part of
+the state machine library.
+
+public class EventTypeGuard implements Guard
+{
+    private final Class<?> type;
+
+    public EventTypeGuard(Class<?> type)
+    {
+        this.type = type;
+    }
+    
+    public boolean accept(Event message, Entity entity, State state)
+    {
+        return (type.isInstance(message));
+    }
+}
+
+Guard conditions can of course implement any degree of complexity,
+but to ensure software correctness and your own sanity Guard.accept()
+should be deterministic (i.e., always give the same answer for the
+same inputs) and free of side-effects.
+
+The state machine library provides the following built-in Guard
+implementations:
+
+    * EventTypeGuard - Returns true if the Event matches a particular Java type.
+    * NegationGuard - Returns true if the Guard it contains is false (negates a Guard response)
+    * PositiveGuard - Always returns true. Useful for default conditions.
+    * RegexGuard - Returns true if the Event is a String that matches a particular Regex expression. 
+
+The following example shows definition of a Transition:
+
+stmap = new StateTransitionMap();
+// Add states...
+Guard startGuard = new EventTypeGuard(StartEvent.class);
+Guard disableGuard = new EventTypeGuard(DisableEvent.class);
+Guard enableGuard = new EventTypeGuard(EnableEvent.class);
+Guard haltGuard = new EventTypeGuard(HaltEvent.class);
+Guard killGuard = new EventTypeGuard(KillEvent.class);
+      
+// Transitions from INITIALIZING state.   
+stmap.addTransition(new Transition("START-TO-OFFLINE",
+        startGuard, initializing, startAction, offline));
+stmap.addTransition(new Transition("START-TO-TERMINATED-KILL",
+        killGuard, initializing, killAction, terminated));
+
+// Transitions from OFFLINE state. 
+stmap.addTransition(new Transition("OFFLINE-TO-ONLINE",
+        enableGuard, offline, goOnlineAction, online));
+stmap.addTransition(new Transition("OFFLINE-TO-TERMINATED",
+        haltGuard, offline, haltAction, terminated));
+stmap.addTransition(new Transition("OFFLINE-TO-TERMINATED-KILL",
+        killGuard, offline, killAction, terminated));
+
+// Transitions from ONLINE state.  
+stmap.addTransition(new Transition("ONLINE-TO-OFFLINE",
+        disableGuard, online, goOfflineAction, offline));
+stmap.addTransition(new Transition("ONLINE-TO-TERMINATED-KILL",
+        killGuard, online, killAction, terminated));
+
+stmap.build();
+
+Definition of transitions looks a little tedious and is meant to
+be. The foregoing map is a complete definition of all relevant
+states and supported transitions to other states. This is the most
+valuable part of the state machine formalism as it forces you to
+define clearly about exactly which inputs your state machine accepts
+and in which states. Getting it right is an important step to
+creating error-free software that functions correctly in concurrent
+environments.
+
+Sub-State Transitions
+
+Sub-states introduce some interesting variations on transitions.
+However, they reduce to the following rules:
+
+   1. Sub-states share the out-bound transitions of their parent
+   states. This means that if you have a 'shutdown' transition in
+   the OFFLINE state, it would also be available to the OFFLINE:NORMAL
+   state.
+
+   2. If you transfer control directly into a sub-state, parent
+   entry actions will also automatically execute starting with the
+   outermost parent. For example, if you transfer from ONLINE to
+   OFFLINE:NORMAL, the entry action for OFFLINE would execute
+   followed by the entry action for NORMAL.
+
+   3. Similarly, when exiting a sub-state, parent exit actions will
+   also fire starting with the sub-state and proceeding to the
+   outermost affected parent state. For example, if you transfer
+   from OFFLINE:NORMAL to ONLINE, exit actions for NORMAL followed
+   by OFFLINE will fire.
+
+Transitions between sub-states within the same enclosing state are
+identical to normal state transitions.
+
+Instantiating State Machines
+
+State machine instantiation is trivial. You instantiate the instance
+whose state needs to be managed and then instantiate a state machine
+that implements a particular state transition map.
+
+ServiceRuntime runtime = new ServiceRuntime();
+sm = new StateMachine(stmap, new EntityAdapter(runtime));
+
+The new state machine automatically begins in the START state, of
+which only one is allows per state transition map. One nicety
+provided by state machines is the StateChangeListener interface.
+You can associate one or more listeners with a state machine to get
+a callback every time the state machine moves to a new state.
+
+Here is a simple example of a state change listener implementation
+showing also the registration call.
+
+StateChangeListener listener = new StateChangeListener() {
+    public void stateChanged(Entity entity, State oldState, State newState)
+    {
+        logger.info("State changed:  old=" + oldState.getName() 
+            + " new=" + newState.getName());
+    }
+} 
+sm.addListener(listener);
+
+Delivering and Processing Events
+
+State machines event processing follows a very simple model: you
+deliver an Event to the state machine and it does everything else.
+Here's an example:
+
+try
+{
+    sm.applyEvent(new StartEvent());
+}
+throws (FiniteStateException e)
+{
+    // Handle exception...
+}
+
+In services based on state machines, *everything* is an event.
+Operations like start-up, configuration, shutdown, and error
+notifications should all be events. This ensures that your entity
+state will remain consistent under all operating conditions.
+
+Handling Errors
+
+State machines generate several different types of errors, all of
+which are denoted by FiniteStateException. Here are the main types.
+
+* FiniteStateException - A generic covering class for state machine
+exceptions.
+
+* TransitionNotFoundException - State machines throw this exception
+when they cannot find an exception that matches a particular
+event/state combination. Callers can decide whether this is an error
+not.
+
+* TransitionRollbackException - Action.doAction() throws this to
+indicate that an Action has failed but the code has rolled back any
+changes safely. You can use this to tell the state machine to return
+the state machine to the old state. It is up to you to ensure that
+the state machine is really still usable--the StateMachine
+implementation will just take your word for it.
+
+* TransitionFailureException - Action.doAction() throws this to
+indicate that an Action has failed and that the state machine should
+tranition to the error state in order to try to recover. As with a
+rollback, the state machine is still usable. The entry action for
+the error state may execute logic to perform a clean shutdown of
+any services so that the state machine is in a "safe" state for
+further processing.
+
+With full exception handling, state machine invocation looks like
+the following:
+
+try
+{
+    sm.applyEvent(event);
+}
+catch (TransitionNotFoundException e)
+{
+    // We treat transition not found as an irrelevant operation. 
+    logger.info("Ignored an irrelevant operation: " 
+        + e.getEvent().getClass().getSimpleName());
+}
+catch (TransitionRollbackException e)
+{
+    // We log rolled-back transitions as errors but keep on chugging. 
+    logger.error("State transition failed and was rolled back: 
+        + e.getTransition().getInput().getName());
+}
+catch (TransitionFailureException e)
+{
+    // Transition failures mean that we had an error that sent the 
+    // the state machine into its error state. 
+    logger.error("State transition processing error, now in error state: "
+        + e.getTransition().getInput().getName());
+}
+catch (FiniteStateException e)
+{
+    // This is something unexpected.  The state machine is broken. 
+    logger.fatal("Unexpected state transition processing error", e);
+}
+
+Synchronization and Concurrent Processing Model
+
+The StateMachine.applyEvent() method is synchronized to ensure that
+event delivery and state transition processing is handled correctly
+when multiple threads create and deliver events to the state machine.
+Synchronization of the applyEvent() method meets the following
+important goals.
+
+   1. Ensure that state transition processing is single-threaded.
+   Processing a single transition at a time goes a long way to
+   making sure state machine behavior is fully deterministic.
+
+   2. Ensure that state changes are fully visible across threads.
+   The synchronization on the state machine instance is a shared
+   lock, which means that all data changes from one state transition
+   become fully visible to the next state transition, even if it
+   executes in another thread.
+
+The synchronization model has some consequences for applications
+that use state machines.
+
+    * Transition actions should be relatively quick. Long-running
+    actions will block the state machine and should be modeled as
+    states rather than transitions.
+
+    * State change listeners should be similarly quick to avoid
+    blocking.
+
+    * Sending state machine events to other state machines from
+    within Action.doAction() methods can lead to dining philosopher-type
+    deadlocks. State machines have no knowledge of each other, so
+    it is up to you, the user, to avoid deadlocks.
+
+    * Finally, StateMachine.applyEvent() synchronization only
+    protects changes that occur as due to an Action during a
+    transition. You must design and implement synchronization for
+    data structures that are updated outside of transitions.
+
+This last point is a big reason why you should try to make all
+changes to Entity using transitions. Going outside the state machine
+model exposes you to concurrency bugs. It also leads to applications
+that are less flexible and harder to adapt to new types of events.
+If you adopt state machine processing, it is best to go whole-hog.
+
+Limitations and Troubleshooting Suggestions
+
+When To Use State Machines
+
+State machines help ensure correctness of real-time and concurrent
+applications, but there are trade-offs. The fact that processing
+is split up into individual actions driven by transitions can make
+it hard to keep a clear view of the overall processing model. Also,
+actions occur asynchronously when events arrive, which means you
+may not see some problems until the right event arrives when your
+state machine is in the right state.
+
+State machines make sense when the benefits of consistent handling
+of concurrent actions and state changes outweigh the drawbacks. You
+will find state machines most useful for network services, service
+oriented architecture components, and other applications that accept
+concurrent, real-time inputs. In fact, it is very hard to write
+such applications correctly without implementing consistent state
+machine processing.
+
+On the other hand, state machines are not a substitute for basic
+object-oriented design. State machines do not make sense for tracking
+the state of ordinary objects. Having many state machines makes
+applications difficult to understand--it's the same effect you see
+from deep levels of inheritance. Use the smallest number of state
+machines your design requires and make them as simple as possible.
+Tracking Down Bugs
+
+Here are some techniques for avoiding and/or fixing bugs. Note that
+the best way to "fix" bugs is to avoid them in the the first place,
+hence recommendation #1.
+
+   1. Design a clean state model and implement it consistently.
+   Define transitions fully--missing or incorrect transitions are
+   a common source of bugs. Use Event types to select transitions;
+   if your application is driven by well-defined messages it will
+   be easier to understand.
+
+   2. Label states, transitions, and events in an understandable
+   fashion. State and Transition classes include labels for this
+   very reason.
+
+   3. Use logging. The state machine library has log4j debug logging.
+   Turn logging on to track state transition execution. It's helpful
+   for identifying when you go down the wrong path.
+
+   4. Use a debugger. It is easy to set breakpoints on actions, for
+   example, if you need to track why a particular operation is
+   having problems.
+
+Persistent Storage of State Machines
+
+The commons state machine library is in-memory only. If you need
+to store state machines persistently try JBoss jBPM or similar
+products.  
+
+RuntimeExceptions in Actions
+
+State machines do not attempt to detect or handle RuntimeExceptions
+that arise in Action code. It is your job to write code that does
+not have these. In general, if a RuntimeException occurs your state
+machine is broken.
+
+Monitoring
+
+The state machine library does not support runtime monitoring,
+though it should. This may be implemented in a future release using
+JMX. For now you have to do it yourself.
