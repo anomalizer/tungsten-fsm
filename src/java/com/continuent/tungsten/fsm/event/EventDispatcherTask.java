@@ -28,7 +28,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.continuent.tungsten.fsm.core.Event;
 import com.continuent.tungsten.fsm.core.StateMachine;
@@ -44,7 +45,7 @@ import com.continuent.tungsten.fsm.core.StateMachine;
  */
 public class EventDispatcherTask implements Runnable, EventDispatcher
 {
-    private static Logger               logger           = Logger.getLogger(EventDispatcherTask.class);
+    private static Logger               logger           = LoggerFactory.getLogger(EventDispatcherTask.class);
 
     // Variables to define the state machine.
     private StateMachine                stateMachine     = null;

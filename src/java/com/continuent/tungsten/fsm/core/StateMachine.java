@@ -24,7 +24,8 @@ package com.continuent.tungsten.fsm.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implements a finite state machine. Finite state machines are a simple but
@@ -84,7 +85,7 @@ import org.apache.log4j.Logger;
  */
 public class StateMachine
 {
-    private static Logger             logger              = Logger.getLogger(StateMachine.class);
+    private static Logger             logger              = LoggerFactory.getLogger(StateMachine.class);
     private volatile State            state;
     private final Entity              entity;
     private final StateTransitionMap  map;

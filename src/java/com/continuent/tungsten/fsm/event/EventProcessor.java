@@ -21,7 +21,8 @@
 
 package com.continuent.tungsten.fsm.event;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.continuent.tungsten.fsm.core.Event;
 import com.continuent.tungsten.fsm.core.StateMachine;
@@ -34,7 +35,7 @@ import com.continuent.tungsten.fsm.core.StateMachine;
  */
 public class EventProcessor implements Runnable
 {
-    private static Logger                 logger = Logger.getLogger(EventProcessor.class);
+    private static Logger                 logger = LoggerFactory.getLogger(EventProcessor.class);
     private final StateMachine            sm;
     private final EventRequest            request;
     private final EventCompletionListener listener;

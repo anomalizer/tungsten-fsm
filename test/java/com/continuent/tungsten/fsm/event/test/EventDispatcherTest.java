@@ -31,7 +31,7 @@ import java.util.concurrent.TimeoutException;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
 
 import com.continuent.tungsten.fsm.core.EntityAdapter;
 import com.continuent.tungsten.fsm.core.Event;
@@ -49,6 +49,7 @@ import com.continuent.tungsten.fsm.event.EventCompletionListener;
 import com.continuent.tungsten.fsm.event.EventDispatcherTask;
 import com.continuent.tungsten.fsm.event.EventRequest;
 import com.continuent.tungsten.fsm.event.EventStatus;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implements unit test for event dispatch into state machines. Cases cover
@@ -60,7 +61,7 @@ import com.continuent.tungsten.fsm.event.EventStatus;
  */
 public class EventDispatcherTest extends TestCase
 {
-    private static Logger logger = Logger.getLogger(EventDispatcherTest.class);
+    private static Logger logger = LoggerFactory.getLogger(EventDispatcherTest.class);
 
     protected void setUp() throws Exception
     {
