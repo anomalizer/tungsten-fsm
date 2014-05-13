@@ -48,13 +48,13 @@ public class EventDispatcherTask implements Runnable, EventDispatcher
     private static Logger               logger           = LoggerFactory.getLogger(EventDispatcherTask.class);
 
     // Variables to define the state machine.
-    private StateMachine                stateMachine     = null;
-    private Thread                      dispatcherThread = null;
-    private boolean                     cancelled        = false;
-    private EventRequest                currentRequest   = null;
-    private Future<?>                   submittedEvent   = null;
-    private EventCompletionListener     listener;
-    private BlockingQueue<EventRequest> notifications    = new LinkedBlockingQueue<EventRequest>();
+    private StateMachine                   stateMachine     = null;
+    private Thread                         dispatcherThread = null;
+    private boolean                        cancelled        = false;
+    private EventRequest<?>                currentRequest   = null;
+    private Future<?>                      submittedEvent   = null;
+    private EventCompletionListener        listener;
+    private BlockingQueue<EventRequest<?>> notifications    = new LinkedBlockingQueue<EventRequest<?>>();
 
     /**
      * Instantiates a new dispatcher for events on a particular state machine.
@@ -104,7 +104,7 @@ public class EventDispatcherTask implements Runnable, EventDispatcher
                     while (notifications.isEmpty())
                         notifications.wait();
                     currentRequest = notifications.take();
-                    EventProcessor eventProcessor = new EventProcessor(
+                    EventProcessor<?> eventProcessor = new EventProcessor(
                             stateMachine, currentRequest, listener);
                     submittedEvent = pool.submit(eventProcessor);
                 }
@@ -157,7 +157,7 @@ public class EventDispatcherTask implements Runnable, EventDispatcher
      * implement the {#link OutOfBandEvent} interface will be dispatched as if
      * the user had called {@link #putOutOfBand(Event)}.
      */
-    public EventRequest put(Event event) throws InterruptedException
+    public <EventType> EventRequest<EventType> put(Event<EventType> event) throws InterruptedException
     {
         if (event instanceof OutOfBandEvent)
             return putOutOfBand(event);
@@ -169,7 +169,7 @@ public class EventDispatcherTask implements Runnable, EventDispatcher
      * Cancel all pending events and put a new event in the queue for immediate
      * processing.
      */
-    public EventRequest putOutOfBand(Event event) throws InterruptedException
+    public <EventType> EventRequest<EventType> putOutOfBand(Event<EventType> event) throws InterruptedException
     {
         synchronized (notifications)
         {
@@ -182,11 +182,11 @@ public class EventDispatcherTask implements Runnable, EventDispatcher
      * Internal call to put an event into queue regardless of whether it arrived
      * as a normal or out-of-band event.
      */
-    private EventRequest putInternal(Event event) throws InterruptedException
+    private <EventType> EventRequest<EventType> putInternal(Event<EventType> event) throws InterruptedException
     {
         synchronized (notifications)
         {
-            EventRequest request = new EventRequest(this, event);
+            EventRequest<EventType> request = new EventRequest<EventType>(this, event);
             notifications.put(request);
             notifications.notifyAll();
             return request;

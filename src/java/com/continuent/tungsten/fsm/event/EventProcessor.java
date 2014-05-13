@@ -33,17 +33,17 @@ import com.continuent.tungsten.fsm.core.StateMachine;
  * @author <a href="mailto:robert.hodges@continuent.com">Robert Hodges</a>
  * @version 1.0
  */
-public class EventProcessor implements Runnable
+public class EventProcessor<EventType> implements Runnable
 {
     private static Logger                 logger = LoggerFactory.getLogger(EventProcessor.class);
     private final StateMachine            sm;
-    private final EventRequest            request;
+    private final EventRequest<EventType> request;
     private final EventCompletionListener listener;
 
     /**
      * Instantiates a new processor for a particular event and state machine.
      */
-    EventProcessor(StateMachine stateMachine, EventRequest request,
+    EventProcessor(StateMachine stateMachine, EventRequest<EventType> request,
             EventCompletionListener listener)
     {
         this.sm = stateMachine;
@@ -56,7 +56,7 @@ public class EventProcessor implements Runnable
      */
     public void run()
     {
-        Event event = request.getEvent();
+        Event<EventType> event = request.getEvent();
         if (logger.isDebugEnabled())
             logger.debug("Processing event: "
                     + event.getClass().getSimpleName());
