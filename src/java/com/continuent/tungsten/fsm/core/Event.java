@@ -27,21 +27,21 @@ package com.continuent.tungsten.fsm.core;
  * @author <a href="mailto:robert.hodges@continuent.com">Robert Hodges</a>
  * @version 1.0
  */
-public class Event<T>
+public class Event<EventData>
 {
-    private final T data;
+    private final EventData data;
 
     /**
      * Creates a new <code>Event</code> object
      * 
      * @param data Event data or null
      */
-    public Event(T data)
+    public Event(EventData data)
     {
         this.data = data;
     }
 
-    public T getData()
+    public EventData getData()
     {
         return data;
     }
