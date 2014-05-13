@@ -52,9 +52,9 @@ public class RegexGuard implements Guard
      *      com.continuent.tungsten.fsm.core.Entity,
      *      com.continuent.tungsten.fsm.core.State)
      */
-    public <EventType> boolean accept(Event<EventType> message, Entity entity, State state)
+    public boolean accept(Event<?> message, Entity entity, State state)
     {
-        EventType o = message.getData();
+        Object o = message.getData();
         if (o != null && o instanceof String)
         {
             Matcher m = pattern.matcher((String) o);

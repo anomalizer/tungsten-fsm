@@ -50,8 +50,7 @@ public class NegationGuard implements Guard
      *      com.continuent.tungsten.fsm.core.Entity,
      *      com.continuent.tungsten.fsm.core.State)
      */
-    @Override
-    public <EventType> boolean accept(Event<EventType> message, Entity entity, State state)
+    public boolean accept(Event<?> message, Entity entity, State state)
     {
         return (!guard.accept(message, entity, state));
     }
