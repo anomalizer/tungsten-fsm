@@ -37,7 +37,7 @@ public class EventProcessor implements Runnable
 {
     private static Logger                 logger = LoggerFactory.getLogger(EventProcessor.class);
     private final StateMachine            sm;
-    private final EventRequest<?> request;
+    private final EventRequest<?>         request;
     private final EventCompletionListener listener;
 
     /**

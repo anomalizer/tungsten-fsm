@@ -57,6 +57,6 @@ public interface EventDispatcher
      * @param mayInterruptIfRunning If true we can cancel running as opposed to
      *            enqueued request
      */
-    public <EventType> boolean cancelActive(EventRequest<EventType> request,
+    public boolean cancelActive(EventRequest<?> request,
             boolean mayInterruptIfRunning) throws InterruptedException;
 }
