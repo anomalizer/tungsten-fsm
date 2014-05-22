@@ -53,7 +53,7 @@ public class EventDispatcherTask implements Runnable, EventDispatcher
     private EventRequest<?>                currentRequest   = null;
     private Future<?>                      submittedEvent   = null;
     private EventCompletionListener        listener;
-    private BlockingQueue<EventRequest<?>> notifications    = new LinkedBlockingQueue<EventRequest<?>>();
+    private final BlockingQueue<EventRequest<?>> notifications    = new LinkedBlockingQueue<EventRequest<?>>();
 
     /**
      * Instantiates a new dispatcher for events on a particular state machine.
