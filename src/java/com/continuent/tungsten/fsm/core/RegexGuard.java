@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
  */
 public class RegexGuard implements Guard
 {
-    Pattern pattern;
+    private final Pattern pattern;
 
     /**
      * Creates a new <code>RegexGuard</code> object
