@@ -21,18 +21,17 @@
 
 package com.continuent.tungsten.fsm.event;
 
+import com.continuent.tungsten.fsm.core.Event;
+import com.continuent.tungsten.fsm.core.StateMachine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.continuent.tungsten.fsm.core.Event;
-import com.continuent.tungsten.fsm.core.StateMachine;
 
 /**
  * This class defines an event dispatcher task, which is a separate thread that
@@ -104,6 +103,7 @@ public class EventDispatcherTask implements Runnable, EventDispatcher
                     while (notifications.isEmpty())
                         notifications.wait();
                     currentRequest = notifications.take();
+                    @SuppressWarnings({"rawtypes", "unchecked"})
                     EventProcessor<?> eventProcessor = new EventProcessor(
                             stateMachine, currentRequest, listener);
                     submittedEvent = pool.submit(eventProcessor);
