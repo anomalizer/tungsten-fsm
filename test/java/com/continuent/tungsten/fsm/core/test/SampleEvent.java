@@ -23,7 +23,7 @@ package com.continuent.tungsten.fsm.core.test;
 
 import com.continuent.tungsten.fsm.core.Event;
 
-public class SampleEvent extends Event
+public class SampleEvent extends Event<Void>
 {
     public SampleEvent()
     {
