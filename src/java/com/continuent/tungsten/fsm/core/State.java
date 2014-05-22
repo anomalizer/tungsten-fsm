@@ -34,6 +34,7 @@ import java.util.List;
  * @author <a href="mailto:robert.hodges@continuent.com">Robert Hodges</a>
  * @version 1.0
  */
+@lombok.EqualsAndHashCode(of = "qualifiedName")
 public class State
 {
     private final String    name;
@@ -277,17 +278,4 @@ public class State
     /**
      * Returns true if state names match.
      */
-    public boolean equals(Object o)
-    {
-        if (o != null && o instanceof State)
-        {
-            String otherName = ((State) o).getName();
-            if (qualifiedName == null)
-                return qualifiedName == otherName;
-            else
-                return qualifiedName.equals(otherName);
-        }
-        else
-            return false;
-    }
 }
