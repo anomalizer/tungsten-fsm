@@ -103,8 +103,7 @@ public class EventDispatcherTask implements Runnable, EventDispatcher
                     while (notifications.isEmpty())
                         notifications.wait();
                     currentRequest = notifications.take();
-                    @SuppressWarnings({"rawtypes", "unchecked"})
-                    EventProcessor<?> eventProcessor = new EventProcessor(
+                    EventProcessor eventProcessor = new EventProcessor(
                             stateMachine, currentRequest, listener);
                     submittedEvent = pool.submit(eventProcessor);
                 }
