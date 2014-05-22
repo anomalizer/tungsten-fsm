@@ -40,6 +40,6 @@ public interface EventCompletionListener
      * @return An optional object that is stored as an annotation on the request
      * @throws InterruptedException Thrown if interrupted.
      */
-    public abstract Object onCompletion(Event event, EventStatus status)
+    public abstract Object onCompletion(Event<?> event, EventStatus status)
             throws InterruptedException;
 }

@@ -541,7 +541,7 @@ class SampleStatusListener implements EventCompletionListener
     List<EventStatus> statusList = new ArrayList<EventStatus>(10);
 
     @Override
-    public Object onCompletion(Event event, EventStatus status)
+    public Object onCompletion(Event<?> event, EventStatus status)
             throws InterruptedException
     {
         statusList.add(status);
