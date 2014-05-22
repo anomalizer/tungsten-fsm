@@ -339,7 +339,7 @@ public class StateMachineTest extends TestCase
         StateTransitionMap map = new StateTransitionMap();
         State start = new State("START", StateType.START);
         State end1 = new State("END1", StateType.END);
-        State end2 = new State("END1", StateType.END);
+        State end2 = new State("END2", StateType.END);
         Transition t1 = new Transition("t1", new NegationGuard(
                 new PositiveGuard()), start, null, end1);
         Transition t2 = new Transition("t2", new NegationGuard(
