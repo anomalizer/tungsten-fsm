@@ -48,7 +48,7 @@ public class TransitionMatcher
         return transitions;
     }
 
-    public <EventType> Transition matchTransition(Event<EventType> event, Entity entity)
+    public Transition matchTransition(Event<?> event, Entity entity)
     {
         for (Transition transition : transitions)
         {

@@ -43,7 +43,7 @@ public class EventTypeGuard implements Guard
      * {@inheritDoc}
      * @see com.continuent.tungsten.fsm.core.Guard#accept(com.continuent.tungsten.fsm.core.Event, com.continuent.tungsten.fsm.core.Entity, com.continuent.tungsten.fsm.core.State)
      */
-    public boolean accept(Event message, Entity entity, State state)
+    public boolean accept(Event<?> message, Entity entity, State state)
     {
         return (type.isInstance(message));
     }

@@ -145,7 +145,7 @@ public class StateMachine
      * @throws FiniteStateException Thrown if a generic error occurs
      * @throws InterruptedException Thrown if event processing is cancelled
      */
-    public synchronized <EventType> void applyEvent(Event<EventType> event)
+    public synchronized void applyEvent(Event<?> event)
             throws FiniteStateException, InterruptedException
     {
         if (maxTransitions > 0)
