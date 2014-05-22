@@ -44,6 +44,7 @@ import com.continuent.tungsten.fsm.core.TransitionNotFoundException;
 import com.continuent.tungsten.fsm.core.TransitionRollbackException;
 import junit.framework.TestCase;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -784,8 +785,8 @@ public class StateMachineTest extends TestCase
         // Test every combination of moving into and out of sub-states by
         // "boxing"
         // the available transitions.
-        State[] hierarchy = inner2.getHierarchy();
-        for (int inner = 0; inner < hierarchy.length; inner++)
+        List<State> hierarchy = inner2.getHierarchy();
+        for (int inner = 0; inner < hierarchy.size(); inner++)
         {
             for (int outer = 0; outer <= inner; outer++)
             {
@@ -793,7 +794,7 @@ public class StateMachineTest extends TestCase
                 assertEquals("Starting state: start", start, sm1.getState());
 
                 // Transition from start to inner state.
-                State innerState = hierarchy[inner];
+                State innerState = hierarchy.get(inner);
                 String message1 = "START-" + innerState.getBaseName();
                 sm1.applyEvent(new StringEvent(message1));
                 assertEquals(
@@ -801,7 +802,7 @@ public class StateMachineTest extends TestCase
                         innerState, sm1.getState());
 
                 // Transition from start to START using outer transition.
-                State outerState = hierarchy[outer];
+                State outerState = hierarchy.get(outer);
                 String message2 = outerState.getBaseName() + "-START";
                 // System.out.println("Current state=" + sm1.getState() +
                 // " message=" + message2);

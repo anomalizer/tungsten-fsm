@@ -44,7 +44,7 @@ public class State
     private final Action    exitAction;
 
     private final String    qualifiedName;
-    private final State[]   hierarchy;
+    private final List<State>   hierarchy;
     private List<State>     children = new ArrayList<State>();
 
     /**
@@ -70,16 +70,15 @@ public class State
         if (parent == null)
         {
             this.qualifiedName = name;
-            this.hierarchy = new State[]{this};
+            this.hierarchy = Collections.singletonList(this);
         }
         else
         {
             this.qualifiedName = parent.getName() + ":" + name;
-            State[] parentArray = parent.getHierarchy();
-            State[] selfArray = new State[parentArray.length + 1];
-            for (int i = 0; i < parentArray.length; i++)
-                selfArray[i] = parentArray[i];
-            selfArray[selfArray.length - 1] = this;
+            List<State> parentArray = parent.getHierarchy();
+            List<State> selfArray = new ArrayList<State>();
+            selfArray.addAll(parentArray);
+            selfArray.add(this);
             this.hierarchy = selfArray;
         }
 
@@ -219,9 +218,9 @@ public class State
      * s Returns the state hierarchy from the highest enclosing state, if any,
      * down to this state.
      */
-    public State[] getHierarchy()
+    public List<State> getHierarchy()
     {
-        return hierarchy;
+        return Collections.unmodifiableList(hierarchy);
     }
 
     /**
@@ -252,14 +251,14 @@ public class State
     public State getLeastCommonParent(State other)
     {
         State least = null;
-        State[] otherHierarchy = other.getHierarchy();
-        for (int i = 0; i < hierarchy.length; i++)
+        List<State> otherHierarchy = other.getHierarchy();
+        for (int i = 0; i < hierarchy.size(); i++)
         {
 
-            if (otherHierarchy.length <= i)
+            if (otherHierarchy.size() <= i)
                 break;
-            else if (hierarchy[i] == other.getHierarchy()[i])
-                least = hierarchy[i];
+            else if (hierarchy.get(i) == otherHierarchy.get(i))
+                least = hierarchy.get(i);
             else
                 break;
         }
