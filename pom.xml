@@ -60,6 +60,13 @@
                 <inherited>true</inherited>
             </plugin>
 
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <classifier>inmobi</classifier>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
