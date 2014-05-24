@@ -52,6 +52,7 @@ public class RegexGuard implements Guard
      *      com.continuent.tungsten.fsm.core.Entity,
      *      com.continuent.tungsten.fsm.core.State)
      */
+    @Override
     public boolean accept(Event<?> message, Entity entity, State state)
     {
         Object o = message.getData();

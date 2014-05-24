@@ -54,6 +54,7 @@ public class EventProcessor implements Runnable
     /**
      * Submits the event and computes status.
      */
+    @Override
     public void run()
     {
         Event<?> event = request.getEvent();

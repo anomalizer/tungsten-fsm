@@ -127,6 +127,7 @@ public class StateTransitionLatch
     /**
      * Enqueues a new state for examination by the latch.
      */
+    @Override
     public synchronized void stateChanged(Entity entity, State oldState,
             State newState)
     {
@@ -147,6 +148,7 @@ public class StateTransitionLatch
      * 
      * @return Current state if successful or null
      */
+    @Override
     public State call()
     {
         try

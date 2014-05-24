@@ -101,6 +101,7 @@ public class EventRequest<EventType> implements Future<EventStatus>
      * 
      * @see java.util.concurrent.Future#cancel(boolean)
      */
+    @Override
     public synchronized boolean cancel(boolean mayInterruptIfRunning)
     {
         // Perform cancellation based on where we are.
@@ -137,6 +138,7 @@ public class EventRequest<EventType> implements Future<EventStatus>
      * 
      * @see java.util.concurrent.Future#get()
      */
+    @Override
     public synchronized EventStatus get() throws InterruptedException,
             ExecutionException
     {
@@ -153,6 +155,7 @@ public class EventRequest<EventType> implements Future<EventStatus>
      * @throws TimeoutException Thrown if the wait times out
      * @see java.util.concurrent.Future#get(long, java.util.concurrent.TimeUnit)
      */
+    @Override
     public synchronized EventStatus get(long timeout, TimeUnit unit)
             throws InterruptedException, TimeoutException
     {
@@ -189,6 +192,7 @@ public class EventRequest<EventType> implements Future<EventStatus>
      * 
      * @see java.util.concurrent.Future#isCancelled()
      */
+    @Override
     public synchronized boolean isCancelled()
     {
         return (status != null && status.isCancelled());
@@ -199,6 +203,7 @@ public class EventRequest<EventType> implements Future<EventStatus>
      * 
      * @see java.util.concurrent.Future#isDone()
      */
+    @Override
     public synchronized boolean isDone()
     {
         return (status != null);

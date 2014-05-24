@@ -68,6 +68,7 @@ public class EventDispatcherTask implements Runnable, EventDispatcher
     /**
      * Set a listener for event processing completion.
      */
+    @Override
     public void setListener(EventCompletionListener listener)
     {
         this.listener = listener;
@@ -87,6 +88,7 @@ public class EventDispatcherTask implements Runnable, EventDispatcher
      * 
      * @see java.lang.Runnable#run()
      */
+    @Override
     public void run()
     {
         // Allocate a thread pool to process each succeeding event.
@@ -156,6 +158,7 @@ public class EventDispatcherTask implements Runnable, EventDispatcher
      * implement the {#link OutOfBandEvent} interface will be dispatched as if
      * the user had called {@link #putOutOfBand(Event)}.
      */
+    @Override
     public <EventType> EventRequest<EventType> put(Event<EventType> event) throws InterruptedException
     {
         if (event instanceof OutOfBandEvent)
@@ -168,6 +171,7 @@ public class EventDispatcherTask implements Runnable, EventDispatcher
      * Cancel all pending events and put a new event in the queue for immediate
      * processing.
      */
+    @Override
     public <EventType> EventRequest<EventType> putOutOfBand(Event<EventType> event) throws InterruptedException
     {
         synchronized (notifications)
