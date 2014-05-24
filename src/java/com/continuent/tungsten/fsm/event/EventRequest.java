@@ -35,14 +35,14 @@ import com.continuent.tungsten.fsm.core.Event;
  * @author <a href="mailto:robert.hodges@continuent.com">Robert Hodges</a>
  * @version 1.0
  */
-public class EventRequest implements Future<EventStatus>
+public class EventRequest<EventType> implements Future<EventStatus>
 {
-    private final EventDispatcher dispatcher;
-    private final Event           event;
-    private boolean               cancelRequested = false;
-    private boolean               started         = false;
-    private EventStatus           status;
-    private Object                annotation;
+    private final EventDispatcher  dispatcher;
+    private final Event<EventType> event;
+    private boolean                cancelRequested = false;
+    private boolean                started         = false;
+    private EventStatus            status;
+    private Object                 annotation;
 
     /**
      * Instantiates request for this event.
@@ -50,13 +50,13 @@ public class EventRequest implements Future<EventStatus>
      * @param dispatcher Event dispatcher handling the event
      * @param request Pending request
      */
-    EventRequest(EventDispatcher dispatcher, Event event)
+    EventRequest(EventDispatcher dispatcher, Event<EventType> event)
     {
         this.dispatcher = dispatcher;
         this.event = event;
     }
 
-    public synchronized Event getEvent()
+    public synchronized Event<EventType> getEvent()
     {
         return event;
     }
@@ -101,6 +101,7 @@ public class EventRequest implements Future<EventStatus>
      * 
      * @see java.util.concurrent.Future#cancel(boolean)
      */
+    @Override
     public synchronized boolean cancel(boolean mayInterruptIfRunning)
     {
         // Perform cancellation based on where we are.
@@ -137,6 +138,7 @@ public class EventRequest implements Future<EventStatus>
      * 
      * @see java.util.concurrent.Future#get()
      */
+    @Override
     public synchronized EventStatus get() throws InterruptedException,
             ExecutionException
     {
@@ -153,6 +155,7 @@ public class EventRequest implements Future<EventStatus>
      * @throws TimeoutException Thrown if the wait times out
      * @see java.util.concurrent.Future#get(long, java.util.concurrent.TimeUnit)
      */
+    @Override
     public synchronized EventStatus get(long timeout, TimeUnit unit)
             throws InterruptedException, TimeoutException
     {
@@ -189,6 +192,7 @@ public class EventRequest implements Future<EventStatus>
      * 
      * @see java.util.concurrent.Future#isCancelled()
      */
+    @Override
     public synchronized boolean isCancelled()
     {
         return (status != null && status.isCancelled());
@@ -199,6 +203,7 @@ public class EventRequest implements Future<EventStatus>
      * 
      * @see java.util.concurrent.Future#isDone()
      */
+    @Override
     public synchronized boolean isDone()
     {
         return (status != null);

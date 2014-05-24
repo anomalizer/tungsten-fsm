@@ -61,7 +61,7 @@ public interface Action
      * @throws InterruptedException Thrown if the thread processing the action
      *             is interrupted.
      */
-    public void doAction(Event message, Entity entity, Transition transition,
+    public void doAction(Event<?> message, Entity entity, Transition transition,
             int actionType) throws TransitionRollbackException,
             TransitionFailureException, InterruptedException;
 }

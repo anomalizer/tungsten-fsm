@@ -27,7 +27,7 @@ package com.continuent.tungsten.fsm.core;
  * @author <a href="mailto:robert.hodges@continuent.com">Robert Hodges</a>
  * @version 1.0
  */
-public class StringEvent extends Event
+public class StringEvent extends Event<String>
 {
     /**
      * Creates a new <code>StringEvent</code> object

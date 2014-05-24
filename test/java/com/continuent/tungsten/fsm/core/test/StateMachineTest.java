@@ -22,14 +22,6 @@
 
 package com.continuent.tungsten.fsm.core.test;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import junit.framework.TestCase;
-
 import com.continuent.tungsten.fsm.core.Action;
 import com.continuent.tungsten.fsm.core.Entity;
 import com.continuent.tungsten.fsm.core.EntityAdapter;
@@ -50,6 +42,14 @@ import com.continuent.tungsten.fsm.core.Transition;
 import com.continuent.tungsten.fsm.core.TransitionFailureException;
 import com.continuent.tungsten.fsm.core.TransitionNotFoundException;
 import com.continuent.tungsten.fsm.core.TransitionRollbackException;
+import junit.framework.TestCase;
+
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Implements unit test for state machines. Cases cover basic machine behavior
@@ -316,14 +316,14 @@ public class StateMachineTest extends TestCase
         map.build();
 
         // Start a state machine and test state.
-        StateMachine sm = new StateMachine(map, new EntityAdapter(null));
+        StateMachine sm = new StateMachine(map, new EntityAdapter<Void>(null));
         SampleListener listener = new SampleListener();
         sm.addListener(listener);
         assertEquals("Expect initial state", start, sm.getState());
         assertEquals("Not end state", false, sm.isEndState());
 
         // Send a message and confirm the state.
-        sm.applyEvent(new Event(null));
+        sm.applyEvent(new Event<Void>(null));
         assertEquals("Expect end state", end, sm.getState());
         assertEquals("Is end state", true, sm.isEndState());
         assertEquals("Listener calls", 1, listener.getChanges());
@@ -340,7 +340,7 @@ public class StateMachineTest extends TestCase
         StateTransitionMap map = new StateTransitionMap();
         State start = new State("START", StateType.START);
         State end1 = new State("END1", StateType.END);
-        State end2 = new State("END1", StateType.END);
+        State end2 = new State("END2", StateType.END);
         Transition t1 = new Transition("t1", new NegationGuard(
                 new PositiveGuard()), start, null, end1);
         Transition t2 = new Transition("t2", new NegationGuard(
@@ -357,12 +357,12 @@ public class StateMachineTest extends TestCase
         map.build();
 
         // Start a state machine and test state.
-        StateMachine sm = new StateMachine(map, new EntityAdapter(null));
+        StateMachine sm = new StateMachine(map, new EntityAdapter<Void>(null));
         assertEquals("Expect initial state", start, sm.getState());
         assertEquals("Not end state", false, sm.isEndState());
 
         // Send a message and confirm the state goes to end2.
-        sm.applyEvent(new Event(null));
+        sm.applyEvent(new Event<Void>(null));
         assertEquals("Expect end state", end2, sm.getState());
         assertEquals("Is end state", true, sm.isEndState());
     }
@@ -387,12 +387,12 @@ public class StateMachineTest extends TestCase
         map.build();
 
         // Start a state machine and test state.
-        StateMachine sm = new StateMachine(map, new EntityAdapter(null));
+        StateMachine sm = new StateMachine(map, new EntityAdapter<Void>(null));
 
         // Send a message and confirm we get an exception.
         try
         {
-            sm.applyEvent(new Event(null));
+            sm.applyEvent(new Event<Void>(null));
             throw new Exception(
                     "Did not generate an exception when there were no matching transitions");
         }
@@ -426,12 +426,12 @@ public class StateMachineTest extends TestCase
         map.build();
 
         // Test that we reach the end state when all actions succeed.
-        StateMachine sm1 = new StateMachine(map, new EntityAdapter(null));
-        sm1.applyEvent(new Event(null));
+        StateMachine sm1 = new StateMachine(map, new EntityAdapter<Void>(null));
+        sm1.applyEvent(new Event<Void>(null));
         assertEquals("Reached end state", "END", sm1.getState().getName());
 
         // Test that we can roll back from any of the actions.
-        EntityAdapter ea = new EntityAdapter(null);
+        EntityAdapter ea = new EntityAdapter<Void>(null);
         StateMachine sm2 = new StateMachine(map, ea);
         for (int i = 0; i < actions.length; i++)
         {
@@ -441,7 +441,7 @@ public class StateMachineTest extends TestCase
 
             // Pick one to roll back.
             actions[i].setRollback();
-            Event event = new Event(null);
+            Event<Void> event = new Event<Void>(null);
 
             try
             {
@@ -473,8 +473,8 @@ public class StateMachineTest extends TestCase
             actions[i].setBug();
 
             // Create state machine and an event.
-            EntityAdapter ea3 = new EntityAdapter(null);
-            Event event = new Event(null);
+            EntityAdapter<Void> ea3 = new EntityAdapter<Void>(null);
+            Event<Void> event = new Event<Void>(null);
             StateMachine sm3 = new StateMachine(map, ea3);
 
             try
@@ -520,14 +520,14 @@ public class StateMachineTest extends TestCase
         map2.build();
 
         // Confirm map1 goes to end1.
-        StateMachine sm1 = new StateMachine(map1, new EntityAdapter(null));
-        sm1.applyEvent(new Event(null));
+        StateMachine sm1 = new StateMachine(map1, new EntityAdapter<Void>(null));
+        sm1.applyEvent(new Event<Void>(null));
         assertEquals("Expect end state", end1, sm1.getState());
         assertEquals("Is end state", true, sm1.isEndState());
 
         // Confirm map2 goes to end2.
-        StateMachine sm2 = new StateMachine(map2, new EntityAdapter(null));
-        sm2.applyEvent(new Event(null));
+        StateMachine sm2 = new StateMachine(map2, new EntityAdapter<Void>(null));
+        sm2.applyEvent(new Event<Void>(null));
         assertEquals("Expect end state", end2, sm2.getState());
         assertEquals("Is end state", true, sm2.isEndState());
     }
@@ -565,23 +565,23 @@ public class StateMachineTest extends TestCase
         map1.build();
 
         // Create a new state machine that permits three transitions.
-        StateMachine sm1 = new StateMachine(map1, new EntityAdapter(null));
+        StateMachine sm1 = new StateMachine(map1, new EntityAdapter<Void>(null));
         sm1.setMaxTransitions(3);
 
         // Confirm that we can apply a messsage three times and get a
         // FiniteStateException on the fourth try.
-        sm1.applyEvent(new Event(null));
+        sm1.applyEvent(new Event<Void>(null));
         assertEquals("Expect midle1 state", middle1, sm1.getState());
 
-        sm1.applyEvent(new Event(null));
+        sm1.applyEvent(new Event<Void>(null));
         assertEquals("Expect middle2 state", middle2, sm1.getState());
 
-        sm1.applyEvent(new Event(null));
+        sm1.applyEvent(new Event<Void>(null));
         assertEquals("Expect middle1 state", middle1, sm1.getState());
 
         try
         {
-            sm1.applyEvent(new Event(null));
+            sm1.applyEvent(new Event<Void>(null));
             throw new Exception("Able to exceed maxTransitions count!");
         }
         catch (FiniteStateException e)
@@ -596,7 +596,7 @@ public class StateMachineTest extends TestCase
      */
     public void testLoopImplementation() throws Exception
     {
-        Integer entity = new Integer(0);
+        Integer entity = 0;
 
         // Create an action to increment the entity each time we enter a state.
         Action incrementorAction = new Action()
@@ -604,9 +604,10 @@ public class StateMachineTest extends TestCase
             public void doAction(Event ev, Entity entity,
                     Transition transition, int actionType)
             {
-                EntityAdapter ea = (EntityAdapter) entity;
-                int current = ((Integer) ea.getEntity()).intValue();
-                Integer next = new Integer(current + 1);
+                @SuppressWarnings("unchecked")
+                EntityAdapter<Integer> ea = (EntityAdapter<Integer>) entity;
+                int current = ea.getEntity();
+                Integer next = current + 1;
                 ea.setEntity(next);
             }
         };
@@ -617,8 +618,9 @@ public class StateMachineTest extends TestCase
         {
             public boolean accept(Event message, Entity entity, State state)
             {
-                EntityAdapter ea = (EntityAdapter) entity;
-                int current = ((Integer) ea.getEntity()).intValue();
+                @SuppressWarnings("unchecked")
+                EntityAdapter<Integer> ea = (EntityAdapter<Integer>) entity;
+                int current = ea.getEntity();
                 return (current >= 10);
             }
         };
@@ -640,7 +642,7 @@ public class StateMachineTest extends TestCase
         map1.build();
 
         // Create a new state machine that permits three transitions.
-        StateMachine sm1 = new StateMachine(map1, new EntityAdapter(entity));
+        StateMachine sm1 = new StateMachine(map1, new EntityAdapter<Integer>(entity));
         SampleListener listener = new SampleListener();
         sm1.setMaxTransitions(11);
         sm1.addListener(listener);
@@ -649,7 +651,7 @@ public class StateMachineTest extends TestCase
         int counter = 0;
         while (!sm1.getState().isEnd())
         {
-            sm1.applyEvent(new Event(null));
+            sm1.applyEvent(new Event<Void>(null));
             counter++;
         }
 
@@ -657,9 +659,10 @@ public class StateMachineTest extends TestCase
         assertEquals("Events applied 11 times", 11, counter);
 
         // Assert the entity counter is 10 as well.
-        Integer finalInteger = (Integer) ((EntityAdapter) sm1.getEntity())
+        @SuppressWarnings("unchecked")
+        Integer finalInteger = ((EntityAdapter<Integer>) sm1.getEntity())
                 .getEntity();
-        int finalInt = finalInteger.intValue();
+        int finalInt = finalInteger;
         assertEquals("Entity counter is 10", 10, finalInt);
 
         // Assert that there was one state transition recorded by the
@@ -693,7 +696,7 @@ public class StateMachineTest extends TestCase
         map1.build();
 
         // Create a new state machine.
-        StateMachine sm1 = new StateMachine(map1, new EntityAdapter(
+        StateMachine sm1 = new StateMachine(map1, new EntityAdapter<Object>(
                 new Object()));
 
         // Continue to apply events until we reach the end state.
@@ -701,7 +704,7 @@ public class StateMachineTest extends TestCase
         String[] eventNames = {"END", "END0", "END1"};
         while (!sm1.getState().isEnd())
         {
-            Event e = new StringEvent(eventNames[counter]);
+            StringEvent e = new StringEvent(eventNames[counter]);
             sm1.applyEvent(e);
             counter++;
         }
@@ -720,12 +723,12 @@ public class StateMachineTest extends TestCase
         EventTypeGuard acceptDummyEvent = new EventTypeGuard(SampleEvent.class);
 
         // If type is an Event, we accept any event.
-        assertTrue("Accept all", acceptAny.accept(new Event(null), null, null));
+        assertTrue("Accept all", acceptAny.accept(new Event<Void>(null), null, null));
         assertTrue("Accept all", acceptAny
                 .accept(new SampleEvent(), null, null));
 
         // If type is DummyEvent we only expect that.
-        assertFalse("Accept all", acceptDummyEvent.accept(new Event(null),
+        assertFalse("Accept all", acceptDummyEvent.accept(new Event<Void>(null),
                 null, null));
         assertTrue("Accept all", acceptDummyEvent.accept(new SampleEvent(),
                 null, null));
@@ -775,15 +778,15 @@ public class StateMachineTest extends TestCase
         map1.build();
 
         // Create a new state machine.
-        StateMachine sm1 = new StateMachine(map1, new EntityAdapter(
+        StateMachine sm1 = new StateMachine(map1, new EntityAdapter<Object>(
                 new Object()));
         assertEquals("Starting state: start", start, sm1.getState());
 
         // Test every combination of moving into and out of sub-states by
         // "boxing"
         // the available transitions.
-        State[] hierarchy = inner2.getHierarchy();
-        for (int inner = 0; inner < hierarchy.length; inner++)
+        List<State> hierarchy = inner2.getHierarchy();
+        for (int inner = 0; inner < hierarchy.size(); inner++)
         {
             for (int outer = 0; outer <= inner; outer++)
             {
@@ -791,7 +794,7 @@ public class StateMachineTest extends TestCase
                 assertEquals("Starting state: start", start, sm1.getState());
 
                 // Transition from start to inner state.
-                State innerState = hierarchy[inner];
+                State innerState = hierarchy.get(inner);
                 String message1 = "START-" + innerState.getBaseName();
                 sm1.applyEvent(new StringEvent(message1));
                 assertEquals(
@@ -799,7 +802,7 @@ public class StateMachineTest extends TestCase
                         innerState, sm1.getState());
 
                 // Transition from start to START using outer transition.
-                State outerState = hierarchy[outer];
+                State outerState = hierarchy.get(outer);
                 String message2 = outerState.getBaseName() + "-START";
                 // System.out.println("Current state=" + sm1.getState() +
                 // " message=" + message2);
@@ -940,7 +943,7 @@ public class StateMachineTest extends TestCase
         map1.build();
 
         // Create a new state machine.
-        StateMachine sm1 = new StateMachine(map1, new EntityAdapter(
+        StateMachine sm1 = new StateMachine(map1, new EntityAdapter<Object>(
                 new Object()));
         assertEquals("Starting state: start", start, sm1.getState());
 
@@ -1026,12 +1029,12 @@ public class StateMachineTest extends TestCase
         map.build();
 
         // Start a state machine and test state.
-        StateMachine sm = new StateMachine(map, new EntityAdapter(null));
+        StateMachine sm = new StateMachine(map, new EntityAdapter<Void>(null));
         sampleAction.setFailure();
 
         try
         {
-            sm.applyEvent(new Event(null));
+            sm.applyEvent(new Event<Void>(null));
             throw new Exception(
                     "Able to throw TransitionFailedException without error state");
         }
@@ -1084,7 +1087,7 @@ public class StateMachineTest extends TestCase
         map.build();
 
         // Start a state machine.
-        StateMachine sm = new StateMachine(map, new EntityAdapter(null));
+        StateMachine sm = new StateMachine(map, new EntityAdapter<Void>(null));
 
         // Verify that we handle a failed transition into a top-level state.
         sampleAction.setFailure();
@@ -1235,7 +1238,7 @@ public class StateMachineTest extends TestCase
         map.build();
 
         // Start the state machine.
-        StateMachine sm = new StateMachine(map, new EntityAdapter(null));
+        StateMachine sm = new StateMachine(map, new EntityAdapter<Void>(null));
         ExecutorService exec = Executors.newSingleThreadExecutor();
 
         // Verify that we can wait for a transition into a desired state.

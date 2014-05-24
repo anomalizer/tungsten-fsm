@@ -411,7 +411,7 @@ public class StateTransitionMap
      *             the map has not been properly initialized by a call to
      *             {@link #build()}
      */
-    public Transition nextTransition(State inputState, Event event,
+    public Transition nextTransition(State inputState, Event<?> event,
             Entity entity) throws FiniteStateException
     {
         if (!initialized)
@@ -466,7 +466,7 @@ public class StateTransitionMap
      *             the map has not been properly initialized by a call to
      *             {@link #build()}
      */
-    public Transition nextChainedTransition(State inputState, Event event,
+    public Transition nextChainedTransition(State inputState, Event<?> event,
             Entity entity) throws FiniteStateException
     {
         if (!initialized)

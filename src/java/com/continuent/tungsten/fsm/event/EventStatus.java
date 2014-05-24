@@ -20,12 +20,15 @@
 
 package com.continuent.tungsten.fsm.event;
 
+import lombok.EqualsAndHashCode;
+
 /**
  * Defines the status of processing an event in the state machine.
  * 
  * @author <a href="mailto:robert.hodges@continuent.com">Robert Hodges</a>
  * @version 1.0
  */
+@EqualsAndHashCode
 public class EventStatus
 {
     private final boolean   successful;
@@ -59,26 +62,6 @@ public class EventStatus
     public boolean isCancelled()
     {
         return cancelled;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    public boolean equals(Object o)
-    {
-        if (!(o instanceof EventStatus))
-            return false;
-        EventStatus other = (EventStatus) o;
-        if (successful != other.isSuccessful())
-            return false;
-        else if (cancelled != other.isCancelled())
-            return false;
-        else if (exception != other.getException())
-            return false;
-        else
-            return true;
     }
 
     /**

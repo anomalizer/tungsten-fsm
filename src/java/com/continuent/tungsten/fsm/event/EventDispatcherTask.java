@@ -21,18 +21,17 @@
 
 package com.continuent.tungsten.fsm.event;
 
+import com.continuent.tungsten.fsm.core.Event;
+import com.continuent.tungsten.fsm.core.StateMachine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.continuent.tungsten.fsm.core.Event;
-import com.continuent.tungsten.fsm.core.StateMachine;
 
 /**
  * This class defines an event dispatcher task, which is a separate thread that
@@ -48,13 +47,13 @@ public class EventDispatcherTask implements Runnable, EventDispatcher
     private static Logger               logger           = LoggerFactory.getLogger(EventDispatcherTask.class);
 
     // Variables to define the state machine.
-    private StateMachine                stateMachine     = null;
-    private Thread                      dispatcherThread = null;
-    private boolean                     cancelled        = false;
-    private EventRequest                currentRequest   = null;
-    private Future<?>                   submittedEvent   = null;
-    private EventCompletionListener     listener;
-    private BlockingQueue<EventRequest> notifications    = new LinkedBlockingQueue<EventRequest>();
+    private StateMachine                   stateMachine     = null;
+    private Thread                         dispatcherThread = null;
+    private boolean                        cancelled        = false;
+    private EventRequest<?>                currentRequest   = null;
+    private Future<?>                      submittedEvent   = null;
+    private EventCompletionListener        listener;
+    private final BlockingQueue<EventRequest<?>> notifications    = new LinkedBlockingQueue<EventRequest<?>>();
 
     /**
      * Instantiates a new dispatcher for events on a particular state machine.
@@ -69,6 +68,7 @@ public class EventDispatcherTask implements Runnable, EventDispatcher
     /**
      * Set a listener for event processing completion.
      */
+    @Override
     public void setListener(EventCompletionListener listener)
     {
         this.listener = listener;
@@ -88,6 +88,7 @@ public class EventDispatcherTask implements Runnable, EventDispatcher
      * 
      * @see java.lang.Runnable#run()
      */
+    @Override
     public void run()
     {
         // Allocate a thread pool to process each succeeding event.
@@ -157,7 +158,8 @@ public class EventDispatcherTask implements Runnable, EventDispatcher
      * implement the {#link OutOfBandEvent} interface will be dispatched as if
      * the user had called {@link #putOutOfBand(Event)}.
      */
-    public EventRequest put(Event event) throws InterruptedException
+    @Override
+    public <EventType> EventRequest<EventType> put(Event<EventType> event) throws InterruptedException
     {
         if (event instanceof OutOfBandEvent)
             return putOutOfBand(event);
@@ -169,7 +171,8 @@ public class EventDispatcherTask implements Runnable, EventDispatcher
      * Cancel all pending events and put a new event in the queue for immediate
      * processing.
      */
-    public EventRequest putOutOfBand(Event event) throws InterruptedException
+    @Override
+    public <EventType> EventRequest<EventType> putOutOfBand(Event<EventType> event) throws InterruptedException
     {
         synchronized (notifications)
         {
@@ -182,11 +185,11 @@ public class EventDispatcherTask implements Runnable, EventDispatcher
      * Internal call to put an event into queue regardless of whether it arrived
      * as a normal or out-of-band event.
      */
-    private EventRequest putInternal(Event event) throws InterruptedException
+    private <EventType> EventRequest<EventType> putInternal(Event<EventType> event) throws InterruptedException
     {
         synchronized (notifications)
         {
-            EventRequest request = new EventRequest(this, event);
+            EventRequest<EventType> request = new EventRequest<EventType>(this, event);
             notifications.put(request);
             notifications.notifyAll();
             return request;

@@ -93,7 +93,7 @@ public class Transition
     /**
      * Returns true if the guard class accepts this event.
      */
-    public boolean accept(Event event, Entity entity)
+    public boolean accept(Event<?> event, Entity entity)
     {
         return guard.accept(event, entity, input);
     }

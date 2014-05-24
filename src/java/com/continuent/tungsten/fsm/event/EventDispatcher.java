@@ -42,13 +42,13 @@ public interface EventDispatcher
      * Puts an event in the queue for normal processing. This method returns a
      * Future that callers can call to obtain the event status.
      */
-    public EventRequest put(Event event) throws InterruptedException;
+    public <EventType> EventRequest<EventType> put(Event<EventType> event) throws InterruptedException;
 
     /**
      * Cancel all pending events and put a new event in the queue for immediate
      * processing.
      */
-    public EventRequest putOutOfBand(Event event) throws InterruptedException;
+    public <EventType> EventRequest<EventType> putOutOfBand(Event<EventType> event) throws InterruptedException;
 
     /**
      * Cancel a currently running request.
@@ -57,6 +57,6 @@ public interface EventDispatcher
      * @param mayInterruptIfRunning If true we can cancel running as opposed to
      *            enqueued request
      */
-    public boolean cancelActive(EventRequest request,
+    public boolean cancelActive(EventRequest<?> request,
             boolean mayInterruptIfRunning) throws InterruptedException;
 }

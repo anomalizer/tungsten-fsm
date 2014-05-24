@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
  */
 public class RegexGuard implements Guard
 {
-    Pattern pattern;
+    private final Pattern pattern;
 
     /**
      * Creates a new <code>RegexGuard</code> object
@@ -52,7 +52,8 @@ public class RegexGuard implements Guard
      *      com.continuent.tungsten.fsm.core.Entity,
      *      com.continuent.tungsten.fsm.core.State)
      */
-    public boolean accept(Event message, Entity entity, State state)
+    @Override
+    public boolean accept(Event<?> message, Entity entity, State state)
     {
         Object o = message.getData();
         if (o != null && o instanceof String)

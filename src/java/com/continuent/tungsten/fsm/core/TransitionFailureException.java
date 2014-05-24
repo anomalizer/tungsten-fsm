@@ -34,7 +34,7 @@ package com.continuent.tungsten.fsm.core;
 public final class TransitionFailureException extends FiniteStateException
 {
     private static final long serialVersionUID = 1L;
-    private final Event event;
+    private final Event<?> event;
     private final Entity entity; 
     private final Transition transition;
     private final int actionType;
@@ -42,7 +42,7 @@ public final class TransitionFailureException extends FiniteStateException
     /**
      * Creates a transition failure exception.  All fields must be filled out. 
      */
-   public TransitionFailureException(String message, Event event,
+   public TransitionFailureException(String message, Event<?> event,
             Entity entity, Transition transition, int actionType, Throwable t)
     {
         super(message, t);
@@ -52,7 +52,7 @@ public final class TransitionFailureException extends FiniteStateException
         this.actionType = actionType;
     }
 
-    public Event getEvent()
+    public Event<?> getEvent()
     {
         return event;
     }

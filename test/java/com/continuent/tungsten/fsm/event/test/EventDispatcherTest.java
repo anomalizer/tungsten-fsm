@@ -22,17 +22,6 @@
 
 package com.continuent.tungsten.fsm.event.test;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
-import org.slf4j.Logger;
-
 import com.continuent.tungsten.fsm.core.EntityAdapter;
 import com.continuent.tungsten.fsm.core.Event;
 import com.continuent.tungsten.fsm.core.RegexGuard;
@@ -49,7 +38,16 @@ import com.continuent.tungsten.fsm.event.EventCompletionListener;
 import com.continuent.tungsten.fsm.event.EventDispatcherTask;
 import com.continuent.tungsten.fsm.event.EventRequest;
 import com.continuent.tungsten.fsm.event.EventStatus;
+import junit.framework.Assert;
+import junit.framework.TestCase;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Implements unit test for event dispatch into state machines. Cases cover
@@ -478,7 +476,7 @@ public class EventDispatcherTest extends TestCase
         map1.build();
 
         // Create a new state machine.
-        StateMachine sm1 = new StateMachine(map1, new EntityAdapter(
+        StateMachine sm1 = new StateMachine(map1, new EntityAdapter<Object>(
                 new Object()));
         return sm1;
     }
@@ -531,7 +529,7 @@ public class EventDispatcherTest extends TestCase
         map1.build();
 
         // Create a new state machine.
-        StateMachine sm1 = new StateMachine(map1, new EntityAdapter(
+        StateMachine sm1 = new StateMachine(map1, new EntityAdapter<Object>(
                 new Object()));
         return sm1;
     }
@@ -543,7 +541,7 @@ class SampleStatusListener implements EventCompletionListener
     List<EventStatus> statusList = new ArrayList<EventStatus>(10);
 
     @Override
-    public Object onCompletion(Event event, EventStatus status)
+    public Object onCompletion(Event<?> event, EventStatus status)
             throws InterruptedException
     {
         statusList.add(status);

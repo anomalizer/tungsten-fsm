@@ -33,7 +33,8 @@ public class PositiveGuard implements Guard
     /**
      * Accepts any event. {@inheritDoc}
      */
-    public boolean accept(Event message, Entity entity, State state)
+    @Override
+    public boolean accept(Event<?> message, Entity entity, State state)
     {
         return true;
     }

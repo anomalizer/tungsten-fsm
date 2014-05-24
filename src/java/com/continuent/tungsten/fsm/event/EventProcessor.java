@@ -37,13 +37,13 @@ public class EventProcessor implements Runnable
 {
     private static Logger                 logger = LoggerFactory.getLogger(EventProcessor.class);
     private final StateMachine            sm;
-    private final EventRequest            request;
+    private final EventRequest<?>         request;
     private final EventCompletionListener listener;
 
     /**
      * Instantiates a new processor for a particular event and state machine.
      */
-    EventProcessor(StateMachine stateMachine, EventRequest request,
+    EventProcessor(StateMachine stateMachine, EventRequest<?> request,
             EventCompletionListener listener)
     {
         this.sm = stateMachine;
@@ -54,9 +54,10 @@ public class EventProcessor implements Runnable
     /**
      * Submits the event and computes status.
      */
+    @Override
     public void run()
     {
-        Event event = request.getEvent();
+        Event<?> event = request.getEvent();
         if (logger.isDebugEnabled())
             logger.debug("Processing event: "
                     + event.getClass().getSimpleName());

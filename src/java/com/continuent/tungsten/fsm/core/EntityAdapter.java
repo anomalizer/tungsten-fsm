@@ -28,16 +28,16 @@ package com.continuent.tungsten.fsm.core;
  * @author <a href="mailto:robert.hodges@continuent.com">Robert Hodges</a>
  * @version 1.0
  */
-public class EntityAdapter implements Entity
+public class EntityAdapter<EntityType> implements Entity
 {
-    Object entity;
+    EntityType entity;
 
     /**
      * Creates a new instance
      * 
      * @param entity An entity that this adapter should hold
      */
-    public EntityAdapter(Object entity)
+    public EntityAdapter(EntityType entity)
     {
         this.entity = entity;
     }
@@ -45,7 +45,7 @@ public class EntityAdapter implements Entity
     /**
      * Returns the entity stored in this adapter.
      */
-    public Object getEntity()
+    public EntityType getEntity()
     {
         return entity;
     }
@@ -53,7 +53,7 @@ public class EntityAdapter implements Entity
     /**
      * Set the entity instance in the adapter.
      */
-    public void setEntity(Object entity)
+    public void setEntity(EntityType entity)
     {
         this.entity = entity;
     }

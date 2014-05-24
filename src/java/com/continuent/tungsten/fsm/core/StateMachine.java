@@ -145,7 +145,7 @@ public class StateMachine
      * @throws FiniteStateException Thrown if a generic error occurs
      * @throws InterruptedException Thrown if event processing is cancelled
      */
-    public synchronized void applyEvent(Event event)
+    public synchronized void applyEvent(Event<?> event)
             throws FiniteStateException, InterruptedException
     {
         if (maxTransitions > 0)
@@ -232,15 +232,15 @@ public class StateMachine
 
                 // Fire entry actions from the state below the least common
                 // parent (if there is one) to the next state itself.
-                State[] entryStates = nextState.getHierarchy();
+                List<State> entryStates = nextState.getHierarchy();
                 int startIndex = -1;
                 if (leastCommonParent == null)
                     startIndex = 0;
                 else
                 {
-                    for (int i = 0; i < entryStates.length; i++)
+                    for (int i = 0; i < entryStates.size(); i++)
                     {
-                        if (entryStates[i] == leastCommonParent)
+                        if (entryStates.get(i) == leastCommonParent)
                         {
                             startIndex = i + 1;
                             break;
@@ -248,9 +248,9 @@ public class StateMachine
                     }
                 }
 
-                for (int i = startIndex; i < entryStates.length; i++)
+                for (int i = startIndex; i < entryStates.size(); i++)
                 {
-                    State entryState = entryStates[i];
+                    State entryState = entryStates.get(i);
                     if (entryState.getEntryAction() != null)
                     {
                         Action entryAction = entryState.getEntryAction();
